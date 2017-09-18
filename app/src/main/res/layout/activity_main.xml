@@ -1,18 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.cody_.studentchat.MainActivity">
+    tools:context="com.example.cody_.studentchat.MainActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/titleColor"
+        android:textAlignment="center"
+        android:textSize="40dp"
+        android:layout_marginTop="50dp"/>
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:rowCount="2"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical">
+
+        <EditText android:id="@+id/usernameBox"
+            android:layout_row="0"
+            android:layout_width="wrap_content"
+            android:width="250dp"
+            android:hint="Username"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:layout_marginBottom="15dp"/>
+
+        <EditText android:id="@+id/passwordBox"
+            android:inputType="textPassword"
+            android:layout_row="1"
+            android:layout_width="wrap_content"
+            android:width="250dp"
+            android:hint="Password"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"/>
+
+    </GridLayout>
+
+    <Button android:id="@+id/LoginBtn"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_height="wrap_content"
+        android:text="@string/loginBtnText"
+        android:layout_gravity="center_horizontal"
+        android:textSize="20dp"
+        android:background="@color/mainButtonColor"
+        android:textColor="@color/white"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Input!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="@string/createAccountText"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="20dp" />
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgotPasswordText"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

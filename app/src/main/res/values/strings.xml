@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">StudentChat</string>
+    <string name="loginUserText">User ID:</string>
+    <string name="loginPassText">Password:</string>
+    <string name="loginBtnText">Login</string>
+    <string name="forgotPasswordText">Forgot Password</string>
+    <string name="createAccountText">Create Account</string>
 </resources>
