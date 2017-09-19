@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">StudentChat</string>
+    <string name="main_screen">Main Screen</string>
+    <string name="home_screen">Home Screen</string>
+    <string name="app_title">Study Room</string>
+    <string name="login">Login</string>
+    <string name="login_fail">Login failed. Try again.</string>
+    <string name="login_fail_message">Invalid username/password</string>
+    <string name="ok">OK</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="new_account"><u>Create New Account</u></string>
+    <string name="retrieve_account"><u>Forgot ID/Password</u></string>
+
 </resources>
