@@ -9,6 +9,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="new_account"><u>Create New Account</u></string>
-    <string name="retrieve_account"><u>Forgot ID/Password</u></string>
+
+    <string name="action_settings"></string>
 
 </resources>
