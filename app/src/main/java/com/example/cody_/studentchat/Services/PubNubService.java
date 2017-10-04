@@ -2,6 +2,7 @@ package com.example.cody_.studentchat.Services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
@@ -10,6 +11,10 @@ import android.util.Log;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Cody_ on 10/3/2017.
@@ -31,6 +36,8 @@ public class PubNubService extends Service {
             // TODO: process the error
         }
     };
+
+    private final Map<String, List<Callback>> listeners = new HashMap<>();
 
     private boolean initialized;
 
@@ -58,9 +65,17 @@ public class PubNubService extends Service {
         return pubnub;
     }
 
+    IBinder serviceBinder = new LocalBinder();
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return serviceBinder;
+    }
+
+    public class LocalBinder extends Binder{
+        public PubNubService getServiceInstance(){
+            return PubNubService.this;
+        }
     }
 }
