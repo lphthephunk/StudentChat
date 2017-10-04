@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 //startActivity(new Intent(MainActivity.this, HomeScreen.class));
 
                 //else {
-                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                    /*AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                     alertDialog.setTitle(getString(R.string.login_fail));
                     alertDialog.setMessage(getString(R.string.login_fail_message));
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok),
@@ -49,8 +49,9 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             });
-                    alertDialog.show();
+                    alertDialog.show();*/
                 //}
+                startActivity(new Intent(MainActivity.this, HomeScreen.class));
             }
         });
 

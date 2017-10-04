@@ -18,8 +18,10 @@
         </activity>
         <activity android:name=".CreateAccount" />
         <activity android:name=".RetrieveAccount" />
-        <activity android:name=".HomeScreen"
-            android:label="@string/home_screen"></activity>
+        <activity
+            android:name=".HomeScreen"
+            android:label="@string/home_screen" />
+        <activity android:name=".ChatRoomActivity"></activity>
     </application>
 
 </manifest>
