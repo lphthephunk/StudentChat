@@ -8,10 +8,15 @@ import android.provider.SyncStateContract;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.cody_.studentchat.ChatMessage;
+import com.example.cody_.studentchat.Keys.API_Keys;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 
+import org.json.JSONObject;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +26,6 @@ import java.util.Map;
  */
 
 public class PubNubService extends Service {
-
-    // put these in shared preferences
-    private static final String subscribe_key="test"; // TODO: make key
-    private static final String publish_key="test"; // TODO: make key
 
     private final Callback heartbeatCallback = new Callback() {
         @Override
@@ -52,7 +53,7 @@ public class PubNubService extends Service {
     public Pubnub getPubnub(){
         if (null == pubnub){
             // initialize single instance of pubnub if none exist
-            pubnub = new Pubnub(publish_key, subscribe_key, true);
+            pubnub = new Pubnub(API_Keys.PUBLISH_KEY, API_Keys.SUBSCRIBE_KEY, true);
 
             pubnub.setHeartbeat(10000, heartbeatCallback); // every 10 minutes
             pubnub.setHeartbeatInterval(30);
@@ -63,6 +64,82 @@ public class PubNubService extends Service {
         }
 
         return pubnub;
+    }
+
+    public void unSubscribe(String channel){
+        if (initialized){
+            pubnub.unsubscribe(channel);
+        }
+    }
+
+    public void createRoom(final String roomName){
+        if (this.IsInitialized()) {
+            boolean isFound = false;
+            String[] currentChannels = this.getPubnub().getSubscribedChannelsArray();
+            for (String channel : currentChannels) {
+                if (channel.equals(roomName)) {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            if (!isFound){
+                try{
+                    this.getPubnub().subscribe(roomName, new Callback() {
+                        @Override
+                        public void successCallback(String channel, Object message) {
+                            try{
+                                Log.d("Message Received: ", "Received on channel " + channel);
+
+                                if (message instanceof JSONObject){
+                                    JSONObject jsonResponse = (JSONObject) message;
+                                }
+                            }
+                            catch(Exception ex){
+                                Log.d("Room Creation: ", ex.getMessage().toString());
+                            }
+                        }
+                        @Override
+                        public void errorCallback(String channel, PubnubError error){
+                            Log.d("Error Subscribing: ", error.toString());
+                        }
+                    });
+                }
+                catch(Exception ex){
+                    Log.d("Room Creation: ", ex.getMessage().toString());
+                }
+            }
+        }
+    }
+
+    public void joinRoom(final String roomName, final double studentPassword){
+
+    }
+
+    public void publish(String channel, ChatMessage message){
+        try{
+            JSONObject messageJSON = new JSONObject();
+            messageJSON.put(ChatMessage.DEVICETAG, message.getDeviceTag());
+            messageJSON.put(ChatMessage.SENDERUUID, this.getPubnub().getUUID());
+            messageJSON.put(ChatMessage.EMOTICON, "");
+            messageJSON.put(ChatMessage.FROM, message.getMessageFrom());
+            messageJSON.put(ChatMessage.SENTON, new Date());
+            messageJSON.put(ChatMessage.TYPE, message.getType());
+            messageJSON.put(ChatMessage.MESSAGECONTENT, message.getMessageContent());
+
+            this.getPubnub().publish(channel, messageJSON, true, new Callback(){
+                @Override
+                public void successCallback(String channel, Object message){
+                    Log.d("Publish Status: ", "Success");
+                }
+                @Override
+                public void errorCallback(String channel, PubnubError error){
+                    Log.d("Publish Error", error.toString());
+                }
+            });
+        } catch(Exception ex){
+            Log.d("Publish Error: ", ex.getMessage().toString());
+        }
     }
 
     IBinder serviceBinder = new LocalBinder();

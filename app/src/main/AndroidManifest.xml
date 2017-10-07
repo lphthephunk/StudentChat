@@ -21,7 +21,13 @@
         <activity
             android:name=".HomeScreen"
             android:label="@string/home_screen" />
-        <activity android:name=".ChatRoomActivity"></activity>
+        <activity android:name=".ChatRoomActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
+
+        <service
+            android:name=".Services.PubNubService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

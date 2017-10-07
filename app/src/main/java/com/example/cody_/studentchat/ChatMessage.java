@@ -2,6 +2,8 @@ package com.example.cody_.studentchat;
 
 import android.graphics.drawable.Drawable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 /**
@@ -21,7 +23,7 @@ public class ChatMessage {
     // message types
     public static final String PRIVATE_CHAT_REQUEST = "privateChatRequest";
     private String type;
-    private String messageContnet;
+    private String messageContent;
     private String from;
     private Date sentOn;
     private String deviceTag;
@@ -29,9 +31,20 @@ public class ChatMessage {
     private Drawable avatarImage;
     private String senderUUID;
 
-    private ChatMessage(){
+    /*@SerializedName("username")
+    String username;
+    @SerializedName("message")
+    String message;*/
 
+    public ChatMessage(){}
+
+    /*public String getUsername(){
+        return username;
     }
+
+    public String getMessage(){
+        return message;
+    }*/
 
     public String getDeviceTag(){
         return deviceTag;
@@ -45,7 +58,27 @@ public class ChatMessage {
         return from;
     }
 
-    public String getMessageContnet(){
-        return messageContnet;
+    public String getMessageContent(){
+        return messageContent;
+    }
+
+    public void setFrom(String from){
+        this.from = from;
+    }
+
+    public void setMessage(String message){
+        this.messageContent = message;
+    }
+
+    public void setDeviceTag(String deviceTag){
+        this.deviceTag = deviceTag;
+    }
+
+    public void setSenderUUID(String UUID){
+        this.senderUUID = UUID;
+    }
+
+    public void setType(String type){
+        this.type = type;
     }
 }
