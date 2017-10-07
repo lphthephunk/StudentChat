@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.cody_.studentchat">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,13 +24,10 @@
         <activity
             android:name=".HomeScreen"
             android:label="@string/home_screen" />
+
         <activity android:name=".ChatRoomActivity"
             android:windowSoftInputMode="adjustPan"></activity>
 
-        <service
-            android:name=".Services.PubNubService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>

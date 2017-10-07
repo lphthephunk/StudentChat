@@ -9,15 +9,17 @@ import android.widget.TextView;
 
 import com.example.cody_.studentchat.R;
 
+import java.util.List;
+
 /**
  * Created by Cody_ on 10/6/2017.
  */
 
 public class MessageListArrayAdapter extends ArrayAdapter<String> {
     private final Context context;
-    private final String[] values;
+    private final List<String> values;
 
-    public MessageListArrayAdapter(Context context, String[] values){
+    public MessageListArrayAdapter(Context context, List<String> values){
         super(context, -1, values);
         this.context = context;
         this.values = values;
@@ -31,6 +33,8 @@ public class MessageListArrayAdapter extends ArrayAdapter<String> {
 
         TextView usernameBlock = (TextView) rowView.findViewById(R.id.usernameBlock);
         TextView messageBlock = (TextView) rowView.findViewById(R.id.messageBlock);
+
+        messageBlock.setText(values.get(position));
 
         return rowView;
     }
