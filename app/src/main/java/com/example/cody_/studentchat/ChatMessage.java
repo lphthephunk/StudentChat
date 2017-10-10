@@ -22,6 +22,10 @@ public class ChatMessage {
         this.username = username;
     }
 
+    public String toString(){
+        return getUsername() + ": " + getMessage();
+    }
+
     public String getUsername(){
         return username;
     }

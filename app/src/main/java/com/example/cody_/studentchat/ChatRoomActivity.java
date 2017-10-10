@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import android.widget.TextView;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
@@ -40,7 +41,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     JSONObject messageObject;
 
     /*private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
+        @Overrid
         public void onServiceConnected(ComponentName name, IBinder service) {
             chatroomServiceClient = ((PubNubService.LocalBinder)service).getServiceInstance();
             Log.d("Service Status: ", "Connected");
@@ -59,13 +60,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        //TODO: display a custom action bar with a centered title of chatroom
+        setTitle(API_Keys.CHANNEL);
         //getApplicationContext().bindService(new Intent(getApplicationContext(), PubnubException.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
         final EditText chatMessage = (EditText) findViewById(R.id.messageContentEdit);
 
         messageListView = (ListView)findViewById(R.id.MessageListView);
         chatMessageList = new ArrayList<>();
-        chatMessageList.add("First Test message");
         messageAdapter = new MessageListArrayAdapter(getApplicationContext(), chatMessageList);
 
         messageListView.setAdapter(messageAdapter);
@@ -79,8 +81,12 @@ public class ChatRoomActivity extends AppCompatActivity {
                 @Override
                 public void successCallback(String channel, Object message) {
                     super.successCallback(channel, message);
-                    chatMessageList.add(message.toString());
-                    messageListView.scrollTo(0, chatMessageList.size() - 1);
+
+                    ChatMessage deserializedMessage = gson.fromJson(message.toString(), ChatMessage.class);
+
+                    chatMessageList.add(deserializedMessage.toString());
+
+                    //messageListView.scrollTo(0, chatMessageList.size() - 1);
                 }
                 @Override
                 public void errorCallback(String channel, PubnubError error){
