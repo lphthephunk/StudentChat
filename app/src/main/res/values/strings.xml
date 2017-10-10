@@ -1,6 +1,7 @@
 <resources>
     <string name="main_screen">Main Screen</string>
     <string name="home_screen">Home Screen</string>
+    <string name="register_screen">Register Screen</string>
     <string name="app_title">Study Room</string>
     <string name="login">Login</string>
     <string name="login_fail">Login failed. Try again.</string>
@@ -8,8 +9,12 @@
     <string name="ok">OK</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="email">E-Mail Address</string>
+    <string name="confirm_email">Confirm E-mail Address</string>
+    <string name="confirm">Confirm</string>
     <string name="new_account"><u>Create New Account</u></string>
-
+    <string name="old_account"><u>Forgot Username/Password</u></string>
     <string name="action_settings"></string>
 
     <string name="messageHint">Type here...</string>
