@@ -30,7 +30,7 @@ import android.widget.TextView;
 public class ChatRoomActivity extends AppCompatActivity {
 
     String username;
-
+//
     SharedPreferences sharedPreferences;
 
     ListView messageListView;
