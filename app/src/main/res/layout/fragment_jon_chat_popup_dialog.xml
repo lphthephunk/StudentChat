@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/joinChatTitle"
+        android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="20dp"/>
+
+    <EditText android:id="@+id/chatNameField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"/>
+
+    <Button android:id="@+id/submitBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="200dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/submitBtnTxt"/>
+
+</LinearLayout>

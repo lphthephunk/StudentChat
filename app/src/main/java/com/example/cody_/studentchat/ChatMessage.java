@@ -12,18 +12,17 @@ import java.util.Date;
 
 public class ChatMessage {
 
+    // desearlized json will be bound to these two strings
+
     @SerializedName("username")
     String username;
     @SerializedName("message")
     String message;
 
-    public ChatMessage(String username, String message){
-        this.message = message;
-        this.username = username;
-    }
 
-    public String toString(){
-        return getUsername() + ": " + getMessage();
+    public ChatMessage(String username, String message){
+        this.username = username;
+        this.message = message;
     }
 
     public String getUsername(){
