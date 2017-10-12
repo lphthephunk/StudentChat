@@ -1,76 +1,83 @@
 package com.example.cody_.studentchat;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
+import android.support.constraint.solver.SolverVariable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cody_.studentchat.Adapters.MessageListArrayAdapter;
+import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
 import com.example.cody_.studentchat.Keys.API_Keys;
+import com.example.cody_.studentchat.Models.MessageHistory;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
-import com.pubnub.api.models.consumer.PNPublishResult;
+import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryResult;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
-import android.widget.TextView;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.RunnableFuture;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
     String username;
-//
     SharedPreferences sharedPreferences;
 
-    ListView messageListView;
+    RecyclerView messageRecyclerView;
     Gson gson;
-    ArrayList<String> chatMessageList;
-    MessageListArrayAdapter messageAdapter;
+    ArrayList<ChatMessage> chatMessageList;
+    ChatMessageAdapter messageAdapter;
     Pubnub pubnub;
     JSONObject messageObject;
-
-    /*private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Overrid
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            chatroomServiceClient = ((PubNubService.LocalBinder)service).getServiceInstance();
-            Log.d("Service Status: ", "Connected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d("Connection Status: ", "Disconnecting from service");
-            chatroomServiceClient = null;
-        }
-    };*/
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        //TODO: display a custom action bar with a centered title of chatroom
         setTitle(API_Keys.CHANNEL);
-        //getApplicationContext().bindService(new Intent(getApplicationContext(), PubnubException.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
-        final EditText chatMessage = (EditText) findViewById(R.id.messageContentEdit);
+        final EditText messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
 
-        messageListView = (ListView)findViewById(R.id.MessageListView);
+        messageRecyclerView = (RecyclerView) findViewById(R.id.messageRecycler);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        messageRecyclerView.setLayoutManager(linearLayoutManager);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setStackFromEnd(true);
+        messageRecyclerView.setHasFixedSize(false);
+        messageRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
         chatMessageList = new ArrayList<>();
-        messageAdapter = new MessageListArrayAdapter(getApplicationContext(), chatMessageList);
+        messageAdapter = new ChatMessageAdapter(this, R.layout.message_recycler_adapter, chatMessageList);
 
-        messageListView.setAdapter(messageAdapter);
+        messageRecyclerView.setAdapter(messageAdapter);
 
         gson = new Gson();
 
@@ -84,9 +91,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                     ChatMessage deserializedMessage = gson.fromJson(message.toString(), ChatMessage.class);
 
-                    chatMessageList.add(deserializedMessage.toString());
+                    chatMessageList.add(deserializedMessage);
 
-                    //messageListView.scrollTo(0, chatMessageList.size() - 1);
+                    runOnUiThread(updateRecycler);
+
+                    messageRecyclerView.smoothScrollToPosition(chatMessageList.size() - 1);
                 }
                 @Override
                 public void errorCallback(String channel, PubnubError error){
@@ -112,22 +121,37 @@ public class ChatRoomActivity extends AppCompatActivity {
             Log.d("Subscribe Error: ", ex.getMessage().toString());
         }
 
-        chatMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        try{
+            pubnub.history(API_Keys.CHANNEL, 100, new Callback() {
+                @Override
+                public void successCallback(String channel, Object message) {
+                    super.successCallback(channel, message);
+
+                    parseJson(message.toString());
+
+                    runOnUiThread(updateRecycler);
+                }
+            });
+        }catch(Exception ex){
+            Log.d("History Error: ", ex.getMessage().toString());
+        }
+
+        messageEntryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 // check if the send button has been pressed by the user
                 if (actionId == EditorInfo.IME_ACTION_SEND){
                     // TODO: send message to group
-                    String message = chatMessage.getText().toString().trim();
+                    String message = messageEntryText.getText().toString().trim();
                     if (message.length() != 0){
                         message = gson.toJson(new ChatMessage("Test User", message));
                         try{
                             messageObject = new JSONObject(message);
-                        } catch(JSONException ex){
-                            Log.d("Message Conversion: ", ex.getMessage().toString());
+                        }catch(Exception ex){
+                            Log.d("Json conversion: ", ex.getMessage());
                         }
-                        // clear out the message input
-                        chatMessage.setText("");
+                        // clear the message input
+                        messageEntryText.setText("");
                         // publish the message
                         try {
                             pubnub.publish(API_Keys.CHANNEL, messageObject, new Callback() {
@@ -149,6 +173,30 @@ public class ChatRoomActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private Runnable updateRecycler = new Runnable() {
+        @Override
+        public void run() {
+            messageAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private void parseJson(String jsonStr) {
+        try{
+            JSONArray jsonArray = new JSONArray(jsonStr);
+            JSONArray innerJsonArray = jsonArray.getJSONArray(0);
+            for(int i = 0; i < innerJsonArray.length(); i++) {
+                JSONObject jsonObject = innerJsonArray.getJSONObject(i);
+                String msg = jsonObject.getString("message");
+                String user = jsonObject.getString("username");
+
+                ChatMessage message = new ChatMessage(user, msg);
+                chatMessageList.add(message);
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

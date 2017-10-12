@@ -7,7 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.cody_.studentchat.Fragments.JoinChatPopupDialogFragment;
+import com.example.cody_.studentchat.Fragments.CreateChatPopupDialogFragment;
+import com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment;
 
 public class HomeScreen extends AppCompatActivity {
 
@@ -22,12 +23,15 @@ public class HomeScreen extends AppCompatActivity {
         String email = intent.getStringExtra("email");
 
         Button joinRoomBtn = (Button)findViewById(R.id.JoinRoomBtn);
-        Button createRoomBtn = (Button)findViewById(R.id.CreateRoomBtn);
+        final Button createRoomBtn = (Button)findViewById(R.id.CreateRoomBtn);
         Button mapBtn = (Button)findViewById(R.id.MapBtn);
 
         joinRoomBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                JonChatPopupDialogFragment dialogFragment = new JonChatPopupDialogFragment();
+                dialogFragment.show(fm, "Join a ChatRoom");
 
             }
         });
@@ -36,8 +40,8 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getSupportFragmentManager();
-                JoinChatPopupDialogFragment dialogFragment = new JoinChatPopupDialogFragment();
-                dialogFragment.show(fm, "Join a ChatRoom");
+                CreateChatPopupDialogFragment dialogFragment = new CreateChatPopupDialogFragment();
+                dialogFragment.show(fm, "Create a ChatRoom");
             }
         });
 

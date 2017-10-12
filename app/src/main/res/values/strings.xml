@@ -25,6 +25,9 @@
     <string name="mapBtn">View Map</string>
 
     <!-- join chat popup fragment -->
-    <string name="joinChatTitle">Enter ChatRoom Password</string>
+    <string name="createChatTitle">Enter ChatRoom Name</string>
     <string name="submitBtnTxt">Submit</string>
+
+    <!-- create chat popup fragment -->
+    <string name="joinChatTitle">Enter ChatRoom Name</string>
 </resources>

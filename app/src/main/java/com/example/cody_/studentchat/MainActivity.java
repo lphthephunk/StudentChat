@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
+                        /*try {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");
 
@@ -75,9 +75,12 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }
                 };
+                // remove this once database is working
+                MainActivity.this.startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+
 
                 LoginRequest loginRequest = new LoginRequest(username, password, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);

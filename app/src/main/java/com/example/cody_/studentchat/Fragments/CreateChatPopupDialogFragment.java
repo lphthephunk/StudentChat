@@ -1,11 +1,7 @@
 package com.example.cody_.studentchat.Fragments;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,13 +14,12 @@ import com.example.cody_.studentchat.ChatRoomActivity;
 import com.example.cody_.studentchat.Keys.API_Keys;
 import com.example.cody_.studentchat.R;
 import com.pubnub.api.Pubnub;
-import com.pubnub.api.PubnubException;
 
 /**
  * Created by Cody_ on 10/4/2017.
  */
 
-public class JoinChatPopupDialogFragment extends DialogFragment {
+public class CreateChatPopupDialogFragment extends DialogFragment {
 
     EditText channelNameBox;
     Button submitBtn;
@@ -32,7 +27,7 @@ public class JoinChatPopupDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View rootView = inflater.inflate(R.layout.fragment_join_chat_dialog, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_create_chat_dialog, container, false);
 
         getDialog().setTitle("Enter ChatRoom Password");
 
