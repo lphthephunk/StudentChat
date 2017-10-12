@@ -38,18 +38,10 @@
 
             <EditText
                 android:id="@+id/editTextCreateUsername"
-                android:layout_width="112dp"
+                android:layout_width="204dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPersonName"
-                android:layout_weight="0.28" />
-
-            <Button
-                android:id="@+id/buttonUsernameConfirm"
-                android:layout_width="62dp"
-                android:layout_height="wrap_content"
-                android:text="@string/confirm"
-                android:textSize="8sp"/>
+                android:inputType="textPersonName" />
 
         </LinearLayout>
 
@@ -70,7 +62,8 @@
                 android:layout_width="202dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:layout_weight="0.01" />
         </LinearLayout>
 
         <LinearLayout

@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +25,8 @@ public class CreateAccount extends AppCompatActivity {
     EditText etpasswordConfirm;
     EditText etemail;
     EditText etemailConfirm;
-    Button usernameConfirm;
     Button save;
 
-    boolean username_check = false;
     boolean password_check = false;
     boolean email_check = false;
 
@@ -41,7 +40,6 @@ public class CreateAccount extends AppCompatActivity {
         etpasswordConfirm = (EditText)findViewById(R.id.editTextConfirmPassword);
         etemail = (EditText)findViewById(R.id.editTextCreateEmail);
         etemailConfirm = (EditText)findViewById(R.id.editTextConfirmEmail);
-        usernameConfirm = (Button)findViewById(R.id.buttonUsernameConfirm);
         save = (Button)findViewById(R.id.buttonCreateAccount);
 
         etpasswordConfirm.addTextChangedListener(new TextWatcher() {
@@ -68,6 +66,7 @@ public class CreateAccount extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
 
             }
+
         });
 
         etemailConfirm.addTextChangedListener(new TextWatcher() {
@@ -100,24 +99,25 @@ public class CreateAccount extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String username = etusername.getText().toString();
-                String password = etpassword.getText().toString();
+                final String password = etpassword.getText().toString();
                 String email = etemail.getText().toString();
 
-                Response.Listener<String> responseListener = new Response.Listener<String>(){
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");
-
-                            if (success)
-                            {
-                                startActivity(new Intent(CreateAccount.this, MainActivity.class));
-                            }
-                            else
-                            {
+                            if (success) {
+                                Intent intent = new Intent(CreateAccount.this, MainActivity.class);
+                                CreateAccount.this.startActivity(intent);
+                            } else {
+                                etusername.setBackgroundResource(R.drawable.red_box);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(CreateAccount.this);
-                                builder.setMessage("Register Failed").setNegativeButton("Retry", null).create().show();
+                                builder.setMessage("Register Failed:\nUsername Already Exists")
+                                        .setNegativeButton("Retry", null)
+                                        .create()
+                                        .show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
