@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.cody_.studentchat.Fragments.CreateChatPopupDialogFragment;
 import com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment;
@@ -19,8 +20,22 @@ public class HomeScreen extends AppCompatActivity {
 
         Intent intent = getIntent();
         String username = intent.getStringExtra("username");
+        String firstname = intent.getStringExtra("firstname");
+        String lastname = intent.getStringExtra("lastname");
         String password = intent.getStringExtra("password");
         String email = intent.getStringExtra("email");
+        long mobile = intent.getLongExtra("mobile", -1);
+
+//------------------------Testing-----------------------------
+        TextView test = (TextView)findViewById(R.id.test);
+        test.setText(
+                "Username = " + username + "\n" +
+                "Firstname = " + firstname + "\n" +
+                "Lastname = " + lastname + "\n" +
+                "Password = " + password + "\n" +
+                "E-mail = " + email + "\n" +
+                "Phone Number = " + mobile + "\n");
+//------------------------Testing-----------------------------
 
         Button joinRoomBtn = (Button)findViewById(R.id.JoinRoomBtn);
         final Button createRoomBtn = (Button)findViewById(R.id.CreateRoomBtn);

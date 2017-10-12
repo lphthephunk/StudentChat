@@ -32,4 +32,9 @@
                     tools:layout_editor_absoluteX="8dp"
                     android:layout_gravity="center_horizontal"/>
 
+    <TextView
+        android:id="@+id/test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

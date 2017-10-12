@@ -8,6 +8,9 @@
     <string name="login_fail_message">Invalid username/password</string>
     <string name="ok">OK</string>
     <string name="username">Username</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone_number">Phone Number(optional)</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="email">E-Mail Address</string>
@@ -16,6 +19,7 @@
     <string name="new_account"><u>Create New Account</u></string>
     <string name="old_account"><u>Forgot Username/Password</u></string>
     <string name="action_settings"></string>
+    <string name="phone_number_hint">Example: 1231231234</string>
 
     <string name="messageHint">Type here...</string>
 

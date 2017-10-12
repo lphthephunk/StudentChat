@@ -2,6 +2,7 @@ package com.example.cody_.studentchat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,10 +22,13 @@ import org.json.JSONObject;
 public class CreateAccount extends AppCompatActivity {
 
     EditText etusername;
+    EditText etfirstname;
+    EditText etlastname;
     EditText etpassword;
     EditText etpasswordConfirm;
     EditText etemail;
     EditText etemailConfirm;
+    EditText etmobile;
     Button save;
 
     boolean password_check = false;
@@ -36,11 +40,70 @@ public class CreateAccount extends AppCompatActivity {
         setContentView(R.layout.activity_create_account);
 
         etusername = (EditText)findViewById(R.id.editTextCreateUsername);
+        etfirstname = (EditText)findViewById(R.id.editTextFirstName);
+        etlastname = (EditText)findViewById(R.id.editTextLastName);
         etpassword = (EditText)findViewById(R.id.editTextCreatePassword);
         etpasswordConfirm = (EditText)findViewById(R.id.editTextConfirmPassword);
         etemail = (EditText)findViewById(R.id.editTextCreateEmail);
         etemailConfirm = (EditText)findViewById(R.id.editTextConfirmEmail);
+        etmobile = (EditText)findViewById(R.id.editTextPhoneNumber);
         save = (Button)findViewById(R.id.buttonCreateAccount);
+
+        save.setEnabled(false);
+
+        final Drawable originalDra = etusername.getBackground();
+
+        etusername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                etusername.setBackgroundDrawable(originalDra);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        etpassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (etpasswordConfirm.getText().toString().equals(etpassword.getText().toString()))
+                {
+                    etpasswordConfirm.setBackgroundResource(R.drawable.green_box);
+                    password_check = true;
+                    if (email_check)
+                    {
+                        save.setEnabled(true);
+                    }
+                }
+                else
+                {
+                    etpasswordConfirm.setBackgroundResource(R.drawable.red_box);
+                    password_check = false;
+                    save.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (etpassword.getText().toString().matches("")) {
+                    etpasswordConfirm.setBackgroundDrawable(originalDra);
+                    password_check = false;
+                    save.setEnabled(false);
+                }
+            }
+
+        });
 
         etpasswordConfirm.addTextChangedListener(new TextWatcher() {
             @Override
@@ -54,11 +117,16 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etpasswordConfirm.setBackgroundResource(R.drawable.green_box);
                     password_check = true;
+                    if (email_check)
+                    {
+                        save.setEnabled(true);
+                    }
                 }
                 else
                 {
                     etpasswordConfirm.setBackgroundResource(R.drawable.red_box);
                     password_check = false;
+                    save.setEnabled(false);
                 }
             }
 
@@ -67,6 +135,41 @@ public class CreateAccount extends AppCompatActivity {
 
             }
 
+        });
+
+        etemail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (etemailConfirm.getText().toString().equals(etemail.getText().toString()))
+                {
+                    etemailConfirm.setBackgroundResource(R.drawable.green_box);
+                    email_check = true;
+                    if (password_check)
+                    {
+                        save.setEnabled(true);
+                    }
+                }
+                else
+                {
+                    etemailConfirm.setBackgroundResource(R.drawable.red_box);
+                    email_check = false;
+                    save.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (etemail.getText().toString().matches("")) {
+                    etemailConfirm.setBackgroundDrawable(originalDra);
+                    email_check = false;
+                    save.setEnabled(false);
+                }
+            }
         });
 
         etemailConfirm.addTextChangedListener(new TextWatcher() {
@@ -81,11 +184,16 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etemailConfirm.setBackgroundResource(R.drawable.green_box);
                     email_check = true;
+                    if (password_check)
+                    {
+                        save.setEnabled(true);
+                    }
                 }
                 else
                 {
                     etemailConfirm.setBackgroundResource(R.drawable.red_box);
                     email_check = false;
+                    save.setEnabled(false);
                 }
             }
 
@@ -99,8 +207,11 @@ public class CreateAccount extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String username = etusername.getText().toString();
-                final String password = etpassword.getText().toString();
+                String firstname = etfirstname.getText().toString();
+                String lastname = etlastname.getText().toString();
+                String password = etpassword.getText().toString();
                 String email = etemail.getText().toString();
+                long mobile = Long.parseLong(etmobile.getText().toString());
 
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
@@ -125,7 +236,7 @@ public class CreateAccount extends AppCompatActivity {
                     }
                 };
 
-                RegisterRequest registerRequest = new RegisterRequest(username, password, email, responseListener);
+                RegisterRequest registerRequest = new RegisterRequest(username, firstname, lastname, password, email, mobile, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(CreateAccount.this);
                 queue.add(registerRequest);
             }

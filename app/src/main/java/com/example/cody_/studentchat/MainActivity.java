@@ -49,17 +49,23 @@ public class MainActivity extends AppCompatActivity {
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        /*try {
+                        try {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");
 
                             if (success) {
+                                String firstname = jsonResponse.getString("firstname");
+                                String lastname = jsonResponse.getString("lastname");
                                 String email = jsonResponse.getString("email");
+                                long mobile = jsonResponse.getLong("mobile");
 
                                 Intent i = new Intent(MainActivity.this, HomeScreen.class);
                                 i.putExtra("username", username);
+                                i.putExtra("firstname", firstname);
+                                i.putExtra("lastname", lastname);
                                 i.putExtra("password", password);
                                 i.putExtra("email", email);
+                                i.putExtra("mobile", mobile);
                                 MainActivity.this.startActivity(i);
                             } else {
                                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -75,12 +81,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        }*/
+                        }
                     }
                 };
-                // remove this once database is working
-                MainActivity.this.startActivity(new Intent(getApplicationContext(), HomeScreen.class));
-
 
                 LoginRequest loginRequest = new LoginRequest(username, password, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
