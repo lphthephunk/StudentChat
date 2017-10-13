@@ -6,6 +6,6 @@ package com.example.cody_.studentchat.Keys;
 
 public class API_Keys {
     public static String CHANNEL = "";
-    public static final String PUBLISH_KEY = "pub-c-22505aee-2b2d-41f9-9c9a-9149147d116a";
-    public static final String SUBSCRIBE_KEY = "sub-c-38cf0950-aadd-11e7-8d62-62090b44bf58";
+    public static final String PUBLISH_KEY = "pub-c-0e620e0f-df08-4aa2-8101-cc2a3e53fd5c";
+    public static final String SUBSCRIBE_KEY = "sub-c-4e6ff476-af66-11e7-b96f-72d21da71626";
 }

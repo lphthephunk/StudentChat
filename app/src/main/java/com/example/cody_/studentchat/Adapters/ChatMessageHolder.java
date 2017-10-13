@@ -48,7 +48,6 @@ public class ChatMessageHolder extends RecyclerView.ViewHolder implements View.O
     public void onClick(View v){
         if (chatMessage != null){
 
-            Toast.makeText(this.context, "Message Tapped", Toast.LENGTH_SHORT).show();
         }
     }
 }
