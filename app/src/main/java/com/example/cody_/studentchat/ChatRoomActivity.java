@@ -1,11 +1,13 @@
 package com.example.cody_.studentchat;
 
+import android.content.ClipData;
 import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.constraint.solver.SolverVariable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
+import com.example.cody_.studentchat.Adapters.CustomDivider;
+import com.example.cody_.studentchat.Adapters.ShadowSpaceItemDecorator;
+import com.example.cody_.studentchat.Adapters.VerticalSpacesChat;
 import com.example.cody_.studentchat.Keys.API_Keys;
-import com.example.cody_.studentchat.Models.MessageHistory;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -61,18 +65,27 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
         setTitle(API_Keys.CHANNEL);
 
         final EditText messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
 
         messageRecyclerView = (RecyclerView) findViewById(R.id.messageRecycler);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        messageRecyclerView.setLayoutManager(linearLayoutManager);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         linearLayoutManager.setStackFromEnd(true);
+
+        // set the manager for the recycler view
+        messageRecyclerView.setLayoutManager(linearLayoutManager);
+
+        // add space to the adapter
+        messageRecyclerView.addItemDecoration(new VerticalSpacesChat(5));
+
         messageRecyclerView.setHasFixedSize(false);
         messageRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
 
         chatMessageList = new ArrayList<>();
         messageAdapter = new ChatMessageAdapter(this, R.layout.message_recycler_adapter, chatMessageList);
@@ -80,8 +93,6 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageRecyclerView.setAdapter(messageAdapter);
 
         gson = new Gson();
-
-        pubnub = new Pubnub(API_Keys.PUBLISH_KEY, API_Keys.SUBSCRIBE_KEY);
 
         try{
             pubnub.subscribe(API_Keys.CHANNEL, new Callback() {
@@ -197,6 +208,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         }catch (JSONException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
     }
 
     @Override

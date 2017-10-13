@@ -34,4 +34,9 @@
 
     <!-- create chat popup fragment -->
     <string name="joinChatTitle">Enter ChatRoom Name</string>
+    <string name="title_activity_study_finder">Map</string>
+    <string name="title_activity_map_with_drawer">MapWithDrawer</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

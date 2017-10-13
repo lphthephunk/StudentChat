@@ -57,15 +57,11 @@ public class MainActivity extends AppCompatActivity {
                                 String firstname = jsonResponse.getString("firstname");
                                 String lastname = jsonResponse.getString("lastname");
                                 String email = jsonResponse.getString("email");
-                                long mobile = jsonResponse.getLong("mobile");
 
                                 Intent i = new Intent(MainActivity.this, HomeScreen.class);
                                 i.putExtra("username", username);
-                                i.putExtra("firstname", firstname);
-                                i.putExtra("lastname", lastname);
                                 i.putExtra("password", password);
                                 i.putExtra("email", email);
-                                i.putExtra("mobile", mobile);
                                 MainActivity.this.startActivity(i);
                             } else {
                                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
