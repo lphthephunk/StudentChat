@@ -14,8 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.cody_.studentchat.ChatRoomActivity;
+import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
 import com.example.cody_.studentchat.R;
+import com.pubnub.api.models.consumer.PNPublishResult;
 
 public class JonChatPopupDialogFragment extends DialogFragment {
 
@@ -38,8 +40,12 @@ public class JonChatPopupDialogFragment extends DialogFragment {
                 String channelName = RoomNameField.getText().toString();
                 if (channelName.length() > 0){
                     try{
-                        API_Keys.CHANNEL = channelName;
-                        startActivity(new Intent(getContext(), ChatRoomActivity.class));
+                        Globals.CHANNEL = channelName;
+                        try {
+                            startActivity(new Intent(getContext(), ChatRoomActivity.class));
+                        }catch(Exception ex){
+                            ex.printStackTrace();
+                        }
                     }catch(Exception ex){
                         Log.d("Error joining: ", ex.getMessage());
                     }

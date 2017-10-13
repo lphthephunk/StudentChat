@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.cody_.studentchat.ChatRoomActivity;
+import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
 import com.example.cody_.studentchat.R;
 import com.pubnub.api.Pubnub;
@@ -45,7 +46,7 @@ public class CreateChatPopupDialogFragment extends DialogFragment {
                 if (channelName.length() != 0){
                     try {
                         //chatroomServiceClient.createRoom(channelName);
-                        API_Keys.CHANNEL = channelName;
+                        Globals.CHANNEL = channelName;
                         startActivity(new Intent(getContext(), ChatRoomActivity.class));
                     }catch (Exception ex){
                         Log.d("Error Creating Room: ", ex.getMessage().toString());

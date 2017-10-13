@@ -64,6 +64,9 @@
             android:name=".Drawer"
             android:label="@string/title_activity_map_with_drawer"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service android:name=".Services.StudentChatService"
+            android:exported="false"/>
     </application>
 
 </manifest>

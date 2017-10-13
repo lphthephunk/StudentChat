@@ -22,30 +22,49 @@ import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
 import com.example.cody_.studentchat.Adapters.CustomDivider;
 import com.example.cody_.studentchat.Adapters.ShadowSpaceItemDecorator;
 import com.example.cody_.studentchat.Adapters.VerticalSpacesChat;
+import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.pubnub.api.Callback;
+import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
+import com.pubnub.api.PubNubException;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNLogVerbosity;
+import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryItemResult;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.RunnableFuture;
 
+import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.R.id.message;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -57,7 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     Gson gson;
     ArrayList<ChatMessage> chatMessageList;
     ChatMessageAdapter messageAdapter;
-    Pubnub pubnub;
+    PubNub pubnub;
     JSONObject messageObject;
 
     @Override
@@ -69,7 +88,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        setTitle(API_Keys.CHANNEL);
+        setTitle(Globals.CHANNEL);
 
         final EditText messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
 
@@ -94,57 +113,82 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         gson = new Gson();
 
+        // make new pubnub instance
+        getPubnub();
+
         try{
-            pubnub.subscribe(API_Keys.CHANNEL, new Callback() {
+            pubnub.subscribe()
+            .channels(Arrays.asList(Globals.CHANNEL))
+            .execute();
+
+            pubnub.addListener(new SubscribeCallback() {
                 @Override
-                public void successCallback(String channel, Object message) {
-                    super.successCallback(channel, message);
+                public void status(PubNub pubnub, PNStatus status) {
 
-                    ChatMessage deserializedMessage = gson.fromJson(message.toString(), ChatMessage.class);
+                }
 
-                    chatMessageList.add(deserializedMessage);
+                @Override
+                public void message(PubNub pubnub, final PNMessageResult message) {
+                    Runnable action = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                ChatMessage deserializedMessage = gson.fromJson(message.getMessage().getAsString(), ChatMessage.class);
 
+                                chatMessageList.add(deserializedMessage);
+
+                                messageRecyclerView.smoothScrollToPosition(chatMessageList.size() - 1);
+                            }catch(Exception ex){
+                                ex.printStackTrace();
+                            }
+                        }
+                    };
+                    runOnUiThread(action);
                     runOnUiThread(updateRecycler);
+                }
 
-                    messageRecyclerView.smoothScrollToPosition(chatMessageList.size() - 1);
-                }
                 @Override
-                public void errorCallback(String channel, PubnubError error){
-                    super.errorCallback(channel, error);
-                }
-                @Override
-                public void connectCallback(String channel, Object message){
-                    super.connectCallback(channel, message);
-                    Log.d("Connect callback: ", message.toString());
-                }
-                @Override
-                public void reconnectCallback(String channel, Object message){
-                    super.reconnectCallback(channel, message);
-                    Log.d("Reconnect callback: ", message.toString());
-                }
-                @Override
-                public void disconnectCallback(String channel, Object message){
-                    super.disconnectCallback(channel, message);
-                    Log.d("Disconnect callback: ", message.toString());
+                public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
                 }
             });
-        } catch(PubnubException ex){
-            Log.d("Subscribe Error: ", ex.getMessage().toString());
+        } catch(Exception ex){
+            ex.printStackTrace();
         }
 
         try{
-            pubnub.history(API_Keys.CHANNEL, 100, new Callback() {
-                @Override
-                public void successCallback(String channel, Object message) {
-                    super.successCallback(channel, message);
-
-                    parseJson(message.toString());
-
-                    runOnUiThread(updateRecycler);
-                }
-            });
+            pubnub.history()
+                    .channel(Globals.CHANNEL)
+                    .count(100)
+                    .includeTimetoken(false)
+                    .async(new PNCallback<PNHistoryResult>() {
+                        @Override
+                        public void onResponse(final PNHistoryResult result, PNStatus status) {
+                            Runnable action = new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        if (result != null) {
+                                            List<PNHistoryItemResult> messages = result.getMessages();
+                                            for (PNHistoryItemResult item:messages){
+                                                try{
+                                                    parseJson(item.getEntry().getAsString());
+                                                }catch(Exception ex){
+                                                    ex.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                    }catch(Exception ex){
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            };
+                            runOnUiThread(action);
+                            runOnUiThread(updateRecycler);
+                        }
+                    });
         }catch(Exception ex){
-            Log.d("History Error: ", ex.getMessage().toString());
+            ex.printStackTrace();
         }
 
         messageEntryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -155,7 +199,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     // TODO: send message to group
                     String message = messageEntryText.getText().toString().trim();
                     if (message.length() != 0){
-                        message = gson.toJson(new ChatMessage("Test User", message));
+                        message = gson.toJson(new ChatMessage(Globals.currentUserInfo.concatFirstAndLastName(), message));
                         try{
                             messageObject = new JSONObject(message);
                         }catch(Exception ex){
@@ -164,16 +208,18 @@ public class ChatRoomActivity extends AppCompatActivity {
                         // clear the message input
                         messageEntryText.setText("");
                         // publish the message
-                        try {
-                            pubnub.publish(API_Keys.CHANNEL, messageObject, new Callback() {
-                                @Override
-                                public void successCallback(String channel, Object message) {
-                                    super.successCallback(channel, message);
-                                    Log.d("Posted Message: ", message.toString());
-                                }
-                            });
+                        try{
+                            pubnub.publish()
+                                    .channel(Globals.CHANNEL)
+                                    .message(message)
+                                    .async(new PNCallback<PNPublishResult>(){
+                                        @Override
+                                        public void onResponse(PNPublishResult result, PNStatus status) {
+                                            //Log.d("Message Response: ", result.toString());
+                                        }
+                                    });
                         }catch(Exception ex){
-                            Log.d("Publish Error: ", ex.getMessage().toString());
+                            ex.printStackTrace();
                         }
                     }
                     else{
@@ -186,6 +232,30 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
+    protected void getPubnub(){
+        if (pubnub == null){
+            pubnub = new PubNub(setupPubnubConfig());
+        }
+    }
+
+    public PNConfiguration setupPubnubConfig(){
+        try{
+            PNConfiguration configuration = new PNConfiguration();
+            Properties prop = new Properties();
+
+            configuration.setPublishKey(API_Keys.PUBLISH_KEY);
+            configuration.setSubscribeKey(API_Keys.SUBSCRIBE_KEY);
+            configuration.setUuid(Globals.currentUserInfo.getUUID());
+            //configuration.setSecure(true);
+            configuration.setLogVerbosity(PNLogVerbosity.BODY);
+
+            return configuration;
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     private Runnable updateRecycler = new Runnable() {
         @Override
         public void run() {
@@ -195,23 +265,21 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void parseJson(String jsonStr) {
         try{
-            JSONArray jsonArray = new JSONArray(jsonStr);
-            JSONArray innerJsonArray = jsonArray.getJSONArray(0);
-            for(int i = 0; i < innerJsonArray.length(); i++) {
-                JSONObject jsonObject = innerJsonArray.getJSONObject(i);
-                String msg = jsonObject.getString("message");
-                String user = jsonObject.getString("username");
+            JsonParser jsonParser = new JsonParser();
+            JsonObject obj = jsonParser.parse(jsonStr).getAsJsonObject();
+            String message = obj.get("message").getAsString();
+            String username = obj.get("username").getAsString();
 
-                ChatMessage message = new ChatMessage(user, msg);
-                chatMessageList.add(message);
-            }
-        }catch (JSONException e){
+            ChatMessage chatMessage = new ChatMessage(username, message);
+            chatMessageList.add(chatMessage);
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
 
     @Override
     public boolean onSupportNavigateUp(){
+        pubnub.destroy();
         onBackPressed();
         return true;
     }
@@ -219,6 +287,6 @@ public class ChatRoomActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
-        pubnub.unsubscribe(API_Keys.CHANNEL);
+        pubnub.destroy();
     }
 }

@@ -2,6 +2,7 @@ package com.example.cody_.studentchat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,9 +14,14 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.example.cody_.studentchat.Helpers.Globals;
+import com.example.cody_.studentchat.Models.User;
+import com.pubnub.api.Pubnub;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView newAccount;
     TextView reAccount;
+
+    Pubnub pubnub;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 final String username = etusername.getText().toString();
                 final String password = etpassword.getText().toString();
 
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                /*Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
@@ -54,9 +62,14 @@ public class MainActivity extends AppCompatActivity {
                             boolean success = jsonResponse.getBoolean("success");
 
                             if (success) {
+                                String username = jsonResponse.getString("username");
                                 String firstname = jsonResponse.getString("firstname");
                                 String lastname = jsonResponse.getString("lastname");
                                 String email = jsonResponse.getString("email");
+                                String uuid = jsonResponse.getString("uuid");
+
+                                User user = new User(username, firstname, lastname, email, uuid);
+                                Globals.currentUserInfo = user;
 
                                 Intent i = new Intent(MainActivity.this, HomeScreen.class);
                                 i.putExtra("username", username);
@@ -83,7 +96,13 @@ public class MainActivity extends AppCompatActivity {
 
                 LoginRequest loginRequest = new LoginRequest(username, password, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-                queue.add(loginRequest);
+                queue.add(loginRequest);*/
+
+                User user = new User("PodyCaul", "Cody", "Paul", "pcody8900@gmail.com", ";lkjas;ldkjfa;skljdf;aklsjdfa");
+
+                Globals.currentUserInfo = user;
+
+                startActivity(new Intent(getApplicationContext(), HomeScreen.class));
 
             }
         });
@@ -101,5 +120,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, RetrieveAccount.class));
             }
         });
+    }
+
+    public void InitPubnub(){
+
+
     }
 }

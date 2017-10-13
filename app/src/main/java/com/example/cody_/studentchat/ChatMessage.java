@@ -18,6 +18,10 @@ public class ChatMessage {
     String username;
     @SerializedName("message")
     String message;
+    @SerializedName("startTimeToken")
+    String startTime;
+    @SerializedName("endTimeToken")
+    String endTime;
 
 
     public ChatMessage(String username, String message){

@@ -15,9 +15,15 @@ import android.widget.EditText;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.example.cody_.studentchat.Helpers.Globals;
+import com.example.cody_.studentchat.Models.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 public class CreateAccount extends AppCompatActivity {
 
@@ -211,6 +217,11 @@ public class CreateAccount extends AppCompatActivity {
                 String lastname = etlastname.getText().toString();
                 String password = etpassword.getText().toString();
                 String email = etemail.getText().toString();
+                String uuid = randomUUID().toString();
+
+                // create new user object
+                final User user = new User(username, firstname, lastname, email, uuid);
+
                 long mobile = Long.parseLong(etmobile.getText().toString());
 
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -220,6 +231,13 @@ public class CreateAccount extends AppCompatActivity {
                             JSONObject jsonResponse = new JSONObject(response);
                             boolean success = jsonResponse.getBoolean("success");
                             if (success) {
+
+                                // store the user object in the sqlite database
+                                user.save();
+
+                                Globals.UUID = user.getUUID();
+                                Globals.currentUserInfo = user;
+
                                 Intent intent = new Intent(CreateAccount.this, MainActivity.class);
                                 CreateAccount.this.startActivity(intent);
                             } else {
@@ -236,7 +254,7 @@ public class CreateAccount extends AppCompatActivity {
                     }
                 };
 
-                RegisterRequest registerRequest = new RegisterRequest(username, firstname, lastname, password, email, mobile, responseListener);
+                RegisterRequest registerRequest = new RegisterRequest(username, firstname, lastname, password, email, uuid, mobile, responseListener);
                 RequestQueue queue = Volley.newRequestQueue(CreateAccount.this);
                 queue.add(registerRequest);
             }
