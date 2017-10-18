@@ -4,61 +4,66 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.cody_.studentchat.Drawer;
-import com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment;
-import com.example.cody_.studentchat.Pages.ChatRooms;
+import com.example.cody_.studentchat.Helpers.Globals;
+import com.example.cody_.studentchat.MainDrawer;
 import com.example.cody_.studentchat.R;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.gson.annotations.Expose;
 
-public class HomeScreen extends AppCompatActivity {
+import org.w3c.dom.Text;
 
+import java.util.zip.Inflater;
+
+public class HomeScreen extends Fragment {
+
+    View inflatedView;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_screen);
+    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
+            inflatedView = inflater.inflate(R.layout.activity_home_screen, viewGroup, false);
 
-        Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
-        String firstname = intent.getStringExtra("firstname");
-        String lastname = intent.getStringExtra("lastname");
-        String password = intent.getStringExtra("password");
-        String email = intent.getStringExtra("email");
-        long mobile = intent.getLongExtra("mobile", -1);
+            FragmentManager manager = getFragmentManager();
+            FragmentTransaction ft = manager.beginTransaction();
+            SupportMapFragment fragment = new SupportMapFragment();
+            ft.add(R.id.homeScreenFragment, fragment);
+            ft.commit();
 
-//------------------------Testing-----------------------------
-        /*TextView test = (TextView)findViewById(R.id.test);
-        test.setText(
-                "Username = " + username + "\n" +
-                "Firstname = " + firstname + "\n" +
-                "Lastname = " + lastname + "\n" +
-                "Password = " + password + "\n" +
-                "E-mail = " + email + "\n" +
-                "Phone Number = " + mobile + "\n");*/
-//------------------------Testing-----------------------------
+            initView();
 
-        Button GoToChatRoomsBtn = (Button)findViewById(R.id.GoToChatRoomsBtn);
-        Button mapBtn = (Button)findViewById(R.id.MapBtn);
+            return inflatedView;
+    }
+
+    public void initView() {
+
+        Button GoToChatRoomsBtn = (Button)inflatedView.findViewById(R.id.GoToChatRoomsBtn);
+        Button mapBtn = (Button)inflatedView.findViewById(R.id.MapBtn);
 
         GoToChatRoomsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), ChatRooms.class));
+                startActivity(new Intent(getActivity(), ChatRooms.class));
             }
         });
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PackageManager pm = getPackageManager();
-                if (pm.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(new Intent(getApplicationContext(), Drawer.class));
+                PackageManager pm = getActivity().getPackageManager();
+                if (pm.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getActivity().getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                    Intent i = new Intent(getActivity(), MainDrawer.class);
+                    i.putExtra("pageType", "Map");
+                    startActivity(i);
                 }
                 else {
                     getLocationPermission();
@@ -68,9 +73,9 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
@@ -79,15 +84,15 @@ public class HomeScreen extends AppCompatActivity {
         switch(requestCode){
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    startActivity(new Intent(getApplicationContext(), Drawer.class));
+                    startActivity(new Intent(getActivity(), MainDrawer.class));
                 }
                 break;
         }
     }
-    @Override
+    /*@Override
     public void onBackPressed() {
 
-    }
+    }*/
 }
 
 //add sharedpreference

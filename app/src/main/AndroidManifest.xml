@@ -66,16 +66,16 @@
             android:value=".Models.ChatRoom" />
         <meta-data
             android:name="STUDY_GROUP"
-            android:value=".Models.StudyGroup"/>
+            android:value=".Models.StudyGroup" />
         <meta-data
             android:name="USER"
-            android:value=".Models.User"/>
+            android:value=".Models.User" />
 
         <activity
             android:name=".Pages.StudyFinderActivity"
             android:label="@string/title_activity_study_finder" />
         <activity
-            android:name=".Drawer"
+            android:name=".MainDrawer"
             android:label="@string/title_activity_map_with_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -83,7 +83,7 @@
             android:name=".Services.StudentChatService"
             android:exported="false" />
 
-        <activity android:name=".Pages.ChatRooms"></activity>
+        <activity android:name=".Pages.ChatRooms" />
     </application>
 
 </manifest>

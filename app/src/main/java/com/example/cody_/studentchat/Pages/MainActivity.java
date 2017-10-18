@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.LoginRequest;
+import com.example.cody_.studentchat.MainDrawer;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.R;
 import com.orm.SugarApp;
@@ -73,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
                                 User user = new User(username, firstname, lastname, email, uuid);
                                 Globals.currentUserInfo = user;
 
-                                Intent i = new Intent(MainActivity.this, HomeScreen.class);
+                                Intent i = new Intent(MainActivity.this, MainDrawer.class);
+                                i.putExtra("pageType", "Homescreen");
                                 i.putExtra("username", username);
                                 i.putExtra("password", password);
                                 i.putExtra("email", email);

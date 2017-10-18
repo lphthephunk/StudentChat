@@ -13,9 +13,11 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.example.cody_.studentchat.Helpers.Globals;
+import com.example.cody_.studentchat.Models.User;
+import com.example.cody_.studentchat.Pages.HomeScreen;
 import com.example.cody_.studentchat.Pages.StudyFinderActivity;
 
-public class Drawer extends AppCompatActivity
+public class MainDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     TextView UserNameTextView;
@@ -34,10 +36,20 @@ public class Drawer extends AppCompatActivity
         toggle.syncState();
 
         try {
-            android.support.v4.app.Fragment fragment = new StudyFinderActivity();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.frame_content, fragment);
-            ft.commit();
+            switch(getIntent().getStringExtra("pageType")) {
+                case "Homescreen":
+                    android.support.v4.app.Fragment homeFrag = new HomeScreen();
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.frame_content, homeFrag);
+                    ft.commit();
+                    break;
+                case "Map":
+                    android.support.v4.app.Fragment fragment = new StudyFinderActivity();
+                    FragmentTransaction mapFt = getSupportFragmentManager().beginTransaction();
+                    mapFt.replace(R.id.frame_content, fragment);
+                    mapFt.commit();
+                    break;
+            }
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -45,7 +57,7 @@ public class Drawer extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        UserNameTextView = (TextView)findViewById(R.id.DrawerUserNameTextView);
+        UserNameTextView = (TextView)navigationView.getHeaderView(0).findViewById(R.id.DrawerUserNameTextView);
         UserNameTextView.setText(Globals.currentUserInfo.getUsername());
     }
 
@@ -87,7 +99,7 @@ public class Drawer extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        /*if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
@@ -99,7 +111,7 @@ public class Drawer extends AppCompatActivity
 
         } else if (id == R.id.nav_send) {
 
-        }
+        }*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

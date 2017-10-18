@@ -2,15 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/UserInfoPageBtn"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="User Info"/>
-        <item android:id="@+id/StudyGroups"
-            android:title="Study Groups"/>
-        <item android:id="@+id/LogoutBtn"
-            android:title="Logout"/>
-    </group>
-    <!--<group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
@@ -40,6 +31,6 @@
                 android:icon="@drawable/ic_menu_send"
                 android:title="Send" />
         </menu>
-    </item>-->
+    </item>
 
 </menu>
