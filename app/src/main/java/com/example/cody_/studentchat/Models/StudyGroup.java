@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat.Models;
 
+import com.google.gson.annotations.Expose;
 import com.orm.SugarApp;
 import com.orm.SugarRecord;
 
@@ -12,11 +13,15 @@ import java.util.List;
  * Created by Cody_ on 10/12/2017.
  */
 
-public class StudyGroup extends SugarRecord<StudyGroup> {
+public class StudyGroup extends SugarRecord {
 
+    @Expose
     public String subject;
+    @Expose
     public Date startDate;
+    @Expose
     public Time startTime;
+    @Expose
     public List<User> groupMembers;
 
     public StudyGroup(){}

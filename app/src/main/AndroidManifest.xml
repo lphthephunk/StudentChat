@@ -15,28 +15,28 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name="com.orm.SugarApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_title"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="com.orm.SugarApp"
         tools:replace="android:icon,android:label">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Pages.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreateAccount" />
-        <activity android:name=".RetrieveAccount" />
+        <activity android:name=".Pages.CreateAccount" />
+        <activity android:name=".Pages.RetrieveAccount" />
         <activity
-            android:name=".HomeScreen"
+            android:name=".Pages.HomeScreen"
             android:label="@string/home_screen" />
         <activity
-            android:name=".ChatRoomActivity"
+            android:name=".Pages.ChatRoomActivity"
             android:windowSoftInputMode="adjustPan" />
 
         <!--
@@ -52,21 +52,38 @@
             android:value="@string/google_maps_key" />
 
         <!-- Sugar ORM -->
-        <meta-data android:name="DATABASE" android:value="my_database.db" />
-        <meta-data android:name="VERSION" android:value="1" />
-        <meta-data android:name="QUERY_LOG" android:value="true" />
-        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="com.my-domain" />
+        <meta-data
+            android:name="DATABASE"
+            android:value="StudyGroupDb.db" />
+        <meta-data
+            android:name="VERSION"
+            android:value="2" />
+        <meta-data
+            android:name="QUERY_LOG"
+            android:value="true" />
+        <meta-data
+            android:name="CHAT_ROOM"
+            android:value=".Models.ChatRoom" />
+        <meta-data
+            android:name="STUDY_GROUP"
+            android:value=".Models.StudyGroup"/>
+        <meta-data
+            android:name="USER"
+            android:value=".Models.User"/>
 
         <activity
-            android:name=".StudyFinderActivity"
+            android:name=".Pages.StudyFinderActivity"
             android:label="@string/title_activity_study_finder" />
         <activity
             android:name=".Drawer"
             android:label="@string/title_activity_map_with_drawer"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".Services.StudentChatService"
-            android:exported="false"/>
+        <service
+            android:name=".Services.StudentChatService"
+            android:exported="false" />
+
+        <activity android:name=".Pages.ChatRooms"></activity>
     </application>
 
 </manifest>

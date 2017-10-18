@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.cody_.studentchat.ChatMessage;
+import com.example.cody_.studentchat.Models.ChatMessage;
 
 import java.util.List;
 

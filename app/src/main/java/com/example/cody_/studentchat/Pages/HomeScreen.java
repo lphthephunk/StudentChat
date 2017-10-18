@@ -1,15 +1,21 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Pages;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.cody_.studentchat.Fragments.CreateChatPopupDialogFragment;
+import com.example.cody_.studentchat.Drawer;
 import com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment;
+import com.example.cody_.studentchat.Pages.ChatRooms;
+import com.example.cody_.studentchat.R;
 
 public class HomeScreen extends AppCompatActivity {
 
@@ -27,47 +33,57 @@ public class HomeScreen extends AppCompatActivity {
         long mobile = intent.getLongExtra("mobile", -1);
 
 //------------------------Testing-----------------------------
-        TextView test = (TextView)findViewById(R.id.test);
+        /*TextView test = (TextView)findViewById(R.id.test);
         test.setText(
                 "Username = " + username + "\n" +
                 "Firstname = " + firstname + "\n" +
                 "Lastname = " + lastname + "\n" +
                 "Password = " + password + "\n" +
                 "E-mail = " + email + "\n" +
-                "Phone Number = " + mobile + "\n");
+                "Phone Number = " + mobile + "\n");*/
 //------------------------Testing-----------------------------
 
-        Button joinRoomBtn = (Button)findViewById(R.id.JoinRoomBtn);
-        final Button createRoomBtn = (Button)findViewById(R.id.CreateRoomBtn);
+        Button GoToChatRoomsBtn = (Button)findViewById(R.id.GoToChatRoomsBtn);
         Button mapBtn = (Button)findViewById(R.id.MapBtn);
 
-        joinRoomBtn.setOnClickListener(new View.OnClickListener() {
+        GoToChatRoomsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm = getSupportFragmentManager();
-                JonChatPopupDialogFragment dialogFragment = new JonChatPopupDialogFragment();
-                dialogFragment.show(fm, "Join a ChatRoom");
-
-            }
-        });
-
-        createRoomBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager fm = getSupportFragmentManager();
-                CreateChatPopupDialogFragment dialogFragment = new CreateChatPopupDialogFragment();
-                dialogFragment.show(fm, "Create a ChatRoom");
+                startActivity(new Intent(getApplicationContext(), ChatRooms.class));
             }
         });
 
         mapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), Drawer.class));
+                PackageManager pm = getPackageManager();
+                if (pm.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(new Intent(getApplicationContext(), Drawer.class));
+                }
+                else {
+                    getLocationPermission();
+                }
             }
         });
     }
 
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+        switch(requestCode){
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    startActivity(new Intent(getApplicationContext(), Drawer.class));
+                }
+                break;
+        }
+    }
     @Override
     public void onBackPressed() {
 

@@ -1,7 +1,9 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Pages;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.cody_.studentchat.R;
 
 public class RetrieveAccount extends AppCompatActivity {
 

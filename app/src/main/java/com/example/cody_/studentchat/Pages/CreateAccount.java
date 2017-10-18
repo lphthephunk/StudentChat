@@ -1,6 +1,5 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Pages;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
@@ -17,11 +16,11 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.User;
+import com.example.cody_.studentchat.R;
+import com.example.cody_.studentchat.RegisterRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 

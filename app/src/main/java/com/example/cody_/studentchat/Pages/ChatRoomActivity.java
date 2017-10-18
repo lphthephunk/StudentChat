@@ -1,14 +1,9 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Pages;
 
-import android.content.ClipData;
 import android.content.SharedPreferences;
-import android.graphics.drawable.GradientDrawable;
-import android.support.constraint.solver.SolverVariable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,24 +14,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
-import com.example.cody_.studentchat.Adapters.CustomDivider;
-import com.example.cody_.studentchat.Adapters.ShadowSpaceItemDecorator;
 import com.example.cody_.studentchat.Adapters.VerticalSpacesChat;
+import com.example.cody_.studentchat.Models.ChatMessage;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
+import com.example.cody_.studentchat.R;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-import com.pubnub.api.Callback;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
-import com.pubnub.api.PubNubException;
-import com.pubnub.api.Pubnub;
-import com.pubnub.api.PubnubError;
-import com.pubnub.api.PubnubException;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNLogVerbosity;
@@ -47,30 +34,19 @@ import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.RunnableFuture;
-
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static android.R.id.message;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class ChatRoomActivity extends AppCompatActivity {
 
     String username;
     SharedPreferences sharedPreferences;
+
+    String roomName;
 
     RecyclerView messageRecyclerView;
     Gson gson;
@@ -84,11 +60,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
+        roomName = getIntent().getStringExtra("chatRoomName");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        setTitle(Globals.CHANNEL);
+        setTitle(roomName);
 
         final EditText messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
 
@@ -118,7 +96,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         try{
             pubnub.subscribe()
-            .channels(Arrays.asList(Globals.CHANNEL))
+            .channels(Arrays.asList(roomName))
             .execute();
 
             pubnub.addListener(new SubscribeCallback() {
@@ -158,7 +136,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         try{
             pubnub.history()
-                    .channel(Globals.CHANNEL)
+                    .channel(roomName)
                     .count(100)
                     .includeTimetoken(false)
                     .async(new PNCallback<PNHistoryResult>() {
@@ -210,7 +188,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                         // publish the message
                         try{
                             pubnub.publish()
-                                    .channel(Globals.CHANNEL)
+                                    .channel(roomName)
                                     .message(message)
                                     .async(new PNCallback<PNPublishResult>(){
                                         @Override

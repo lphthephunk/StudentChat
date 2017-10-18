@@ -1,4 +1,4 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Pages;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.cody_.studentchat.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
@@ -86,24 +87,39 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
             public void onMapClick(LatLng latLng) {
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
                 markerList.add(marker);
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                //mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
             }
         });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
                 return false;
             }
         });
 
-        getLocationPermission();
+        mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            @Override
+            public boolean onMyLocationButtonClick() {
+                try {
+                    location = null;
+                    location = getLocation();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+                return false;
+            }
+        });
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
         location = getLocation();
 
@@ -156,25 +172,6 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
             return null;
         }
         return null;
-    }
-
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
-        switch(requestCode){
-            case 1:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-
-                }
-                break;
-        }
     }
 
     @Override

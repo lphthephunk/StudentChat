@@ -10,10 +10,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.cody_.studentchat.ChatRoomActivity;
+import com.example.cody_.studentchat.Models.ChatRoom;
+import com.example.cody_.studentchat.Pages.ChatRoomActivity;
 import com.example.cody_.studentchat.Helpers.Globals;
-import com.example.cody_.studentchat.Keys.API_Keys;
 import com.example.cody_.studentchat.R;
+import com.orm.SugarApp;
 import com.pubnub.api.Pubnub;
 
 /**
@@ -45,9 +46,20 @@ public class CreateChatPopupDialogFragment extends DialogFragment {
                 String channelName = channelNameBox.getText().toString().trim();
                 if (channelName.length() != 0){
                     try {
-                        //chatroomServiceClient.createRoom(channelName);
-                        Globals.CHANNEL = channelName;
-                        startActivity(new Intent(getContext(), ChatRoomActivity.class));
+                        ChatRoom chatRoom = new ChatRoom(channelName);
+                        //insert the chatRoom object into database
+                        chatRoom.AddPerson();
+
+                        try{
+                            chatRoom.save();
+                        }catch(Exception ex){
+                            ex.printStackTrace();
+                        }
+
+                        Intent i = new Intent(getContext(), ChatRoomActivity.class);
+                        i.putExtra("chatRoomName", chatRoom.getRoomName());
+                        startActivity(i);
+
                     }catch (Exception ex){
                         Log.d("Error Creating Room: ", ex.getMessage().toString());
                     }

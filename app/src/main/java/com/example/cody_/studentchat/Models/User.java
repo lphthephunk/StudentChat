@@ -8,7 +8,7 @@ import com.orm.SugarRecord;
  * Created by Cody_ on 10/12/2017.
  */
 
-public class User extends SugarRecord<User> {
+public class User extends SugarRecord {
 
     String firstName;
     String lastName;
@@ -37,4 +37,6 @@ public class User extends SugarRecord<User> {
     public String getUUID(){
         return this.uuid;
     }
+
+    public String getUsername(){return this.username;}
 }

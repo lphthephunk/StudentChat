@@ -1,4 +1,4 @@
-package com.example.cody_.studentchat;
+package com.example.cody_.studentchat.Models;
 
 import android.graphics.drawable.Drawable;
 

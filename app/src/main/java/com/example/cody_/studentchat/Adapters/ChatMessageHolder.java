@@ -1,13 +1,11 @@
 package com.example.cody_.studentchat.Adapters;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.cody_.studentchat.ChatMessage;
+import com.example.cody_.studentchat.Models.ChatMessage;
 import com.example.cody_.studentchat.R;
 
 /**
