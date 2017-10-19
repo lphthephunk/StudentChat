@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat.Models;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.Expose;
 import com.orm.SugarApp;
 import com.orm.SugarRecord;
@@ -16,21 +17,26 @@ import java.util.List;
 public class StudyGroup extends SugarRecord {
 
     @Expose
+    public String groupName;
+    @Expose
     public String subject;
     @Expose
     public Date startDate;
     @Expose
-    public Time startTime;
+    public Long startTime;
     @Expose
     public List<User> groupMembers;
+    @Expose
+    public LatLng location;
 
     public StudyGroup(){}
 
-    public StudyGroup(String subject, Date startDate, Time startTime, ArrayList<User> groupMembers){
+    public StudyGroup(String groupName, LatLng location, String subject, Date startDate, Long startTime){
 
+        this.groupName = groupName;
+        this.location = location;
         this.subject = subject;
         this.startDate = startDate;
         this.startTime = startTime;
-        this.groupMembers = groupMembers;
     }
 }

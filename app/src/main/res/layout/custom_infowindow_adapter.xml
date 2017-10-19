@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <GridLayout android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="250dp"
+        android:minHeight="100dp"
+        android:rowCount="1"
+        android:columnCount="2"
+        android:background="@color/gray">
+
+        <ImageView android:id="@+id/groupImage"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/common_google_signin_btn_icon_dark"/>
+
+        <GridLayout android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:minWidth="200dp"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:rowCount="4">
+
+            <TextView android:id="@+id/GroupNameTextView"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minWidth="200dp"
+                android:textSize="15dp" />
+
+            <TextView android:id="@+id/SubjectTextView"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:minWidth="200dp"
+                android:textSize="15dp"/>
+
+            <TextView android:id="@+id/StartDateTextView"
+                android:layout_row="2"
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:minWidth="200dp"/>
+
+            <TextView android:id="@+id/StartTimeTextView"
+                android:layout_row="3"
+                android:layout_column="0"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:minWidth="200dp"
+                android:textSize="15dp"/>
+
+        </GridLayout>
+
+    </GridLayout>
+
+</LinearLayout>

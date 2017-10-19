@@ -1,6 +1,8 @@
 package com.example.cody_.studentchat.Pages;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
 import android.location.Criteria;
@@ -17,11 +19,18 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cody_.studentchat.Adapters.CustomInfoWindowAdapter;
+import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -35,7 +44,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.content.Context.LOCATION_SERVICE;
@@ -50,12 +61,22 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
     LocationManager locationManager;
     Location location;
 
+    LatLng previousLocation;
+
     List<Marker> markerList = new ArrayList<>();
+
+    GridLayout GroupEntryGrid;
+    Button GroupSubmitBtn;
+
+    boolean IsInfoWindowShownOverride = false;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_study_finder, viewGroup, false);
+
+        GroupEntryGrid = (GridLayout)view.findViewById(R.id.GroupEntryGrid);
+        GroupSubmitBtn = (Button)view.findViewById(R.id.GroupSubmitBtn);
 
         FragmentManager manager = getFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
@@ -81,23 +102,70 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+
+        CustomInfoWindowAdapter customAdapter = new CustomInfoWindowAdapter(getContext());
+        mMap.setInfoWindowAdapter(customAdapter);
+
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                // TODO: show popup allowing user to enter data about study group
+
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng)
+                                                                .title("Test Title")
+                                                                .snippet("Test Snippet"));
                 markerList.add(marker);
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                //mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                marker.setDraggable(true);
+            }
+        });
+
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                previousLocation = marker.getPosition();
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                // TODO: beef up this code in the future to handle multiple study groups at the same location
+                List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class, "Select * from StudyGroup Where location = ? LIMIT 1", previousLocation.toString());
+                StudyGroup myGroup = groupList.get(0);
+
+                myGroup.location = marker.getPosition();
+                myGroup.save();
             }
         });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                try {
+                    if (!IsInfoWindowShownOverride) {
+                        marker.showInfoWindow();
+                        IsInfoWindowShownOverride = true;
+                    }else{
+                        marker.hideInfoWindow();
+                        IsInfoWindowShownOverride = false;
+                        return true;
+                    }
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
                 return false;
+            }
+        });
+
+        mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
+            @Override
+            public void onInfoWindowLongClick(Marker marker) {
+                GroupEntryGrid.setVisibility(View.VISIBLE);
             }
         });
 
@@ -113,6 +181,13 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                     ex.printStackTrace();
                 }
                 return false;
+            }
+        });
+
+        GroupSubmitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GroupEntryGrid.setVisibility(View.GONE);
             }
         });
 
