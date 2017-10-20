@@ -21,22 +21,33 @@ public class StudyGroup extends SugarRecord {
     @Expose
     public String subject;
     @Expose
-    public Date startDate;
+    public String startDate;
     @Expose
-    public Long startTime;
+    public String startTime;
     @Expose
     public List<User> groupMembers;
     @Expose
-    public LatLng location;
+    public String latitude;
+    @Expose
+    public String longitude;
+    @Expose
+    public String groupAdmin;
 
     public StudyGroup(){}
 
-    public StudyGroup(String groupName, LatLng location, String subject, Date startDate, Long startTime){
+    public StudyGroup(String groupAdmin, String groupName, LatLng location, String subject, String startDate, String startTime){
 
+        this.groupAdmin = groupAdmin;
         this.groupName = groupName;
-        this.location = location;
+        this.latitude = String.valueOf(location.latitude);
+        this.longitude = String.valueOf(location.longitude);
         this.subject = subject;
         this.startDate = startDate;
         this.startTime = startTime;
+        this.groupMembers = new ArrayList<>();
     }
+
+    public void addGroupMember(User groupmember){this.groupMembers.add(groupmember);}
+
+    public String getGroupName(){return this.groupName;}
 }

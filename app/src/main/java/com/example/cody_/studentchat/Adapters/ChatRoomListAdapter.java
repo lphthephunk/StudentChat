@@ -40,7 +40,6 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomHolder> {
     @Override
     public void onBindViewHolder(ChatRoomHolder holder, int position) {
         ChatRoom chatRoom = this.chatRooms.get(position);
-
         holder.BindChatRoom(chatRoom);
     }
 

@@ -3,7 +3,9 @@ package com.example.cody_.studentchat.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +26,7 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     private ImageView chatRoomImage;
     private TextView chatRoomName;
+    private Button deleteChatroomBtn;
 
     public ChatRoomHolder(Context context, View itemView){
         super(itemView);
@@ -33,6 +36,14 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
         // bind UI objects (ie: possible image and chatroom name
         this.chatRoomImage = (ImageView)itemView.findViewById(R.id.chatRoomImage);
         this.chatRoomName = (TextView)itemView.findViewById(R.id.chatRoomName);
+        this.deleteChatroomBtn = (Button)itemView.findViewById(R.id.DeleteChatBtn);
+
+        deleteChatroomBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Delete hit: ", "");
+            }
+        });
 
         itemView.setOnClickListener(this);
     }
@@ -41,7 +52,9 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
         this.chatRoom = chatRoom;
 
         this.chatRoomName.setText(chatRoom.getRoomName());
-        this.chatRoomImage.setImageBitmap(chatRoom.getChatRoomImage());
+        if (chatRoom.getChatRoomImage() != null) {
+            this.chatRoomImage.setImageBitmap(chatRoom.getChatRoomImage());
+        }
     }
 
     @Override

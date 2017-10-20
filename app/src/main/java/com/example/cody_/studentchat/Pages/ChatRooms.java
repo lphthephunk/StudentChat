@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.cody_.studentchat.Adapters.ChatRoomListAdapter;
+import com.example.cody_.studentchat.Adapters.CustomDivider;
 import com.example.cody_.studentchat.Fragments.CreateChatPopupDialogFragment;
 import com.example.cody_.studentchat.Fragments.JonChatPopupDialogFragment;
 import com.example.cody_.studentchat.Models.ChatRoom;
@@ -41,8 +42,10 @@ public class ChatRooms extends AppCompatActivity {
 
         chatroomRecycler.setLayoutManager(linearLayoutManager);
 
+        //chatroomRecycler.addItemDecoration(new CustomDivider(this));
+
         chatroomRecycler.setHasFixedSize(false);
-        //chatroomRecycler.setItemAnimator(new DefaultItemAnimator());
+        chatroomRecycler.setItemAnimator(new DefaultItemAnimator());
 
         chatRoomList = new ArrayList<>();
         chatRoomListAdapter = new ChatRoomListAdapter(this, R.layout.chatroom_recycler_adapter, chatRoomList);
@@ -74,5 +77,11 @@ public class ChatRooms extends AppCompatActivity {
         }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        onBackPressed();
+        return true;
     }
 }

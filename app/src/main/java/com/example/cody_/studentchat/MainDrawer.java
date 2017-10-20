@@ -1,6 +1,8 @@
 package com.example.cody_.studentchat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +17,10 @@ import android.widget.TextView;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.Pages.HomeScreen;
+import com.example.cody_.studentchat.Pages.MainActivity;
 import com.example.cody_.studentchat.Pages.StudyFinderActivity;
+import com.example.cody_.studentchat.Pages.StudyGroupActivity;
+import com.example.cody_.studentchat.Pages.UserInfoActivity;
 
 public class MainDrawer extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -29,6 +34,8 @@ public class MainDrawer extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setTitle("Study Room");
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                  this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -36,18 +43,31 @@ public class MainDrawer extends AppCompatActivity
         toggle.syncState();
 
         try {
+
             switch(getIntent().getStringExtra("pageType")) {
                 case "Homescreen":
-                    android.support.v4.app.Fragment homeFrag = new HomeScreen();
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.frame_content, homeFrag);
-                    ft.commit();
+                    Fragment homeFrag = new HomeScreen();
+                    FragmentTransaction homeFt = getSupportFragmentManager().beginTransaction();
+                    homeFt.replace(R.id.frame_content, homeFrag);
+                    homeFt.commit();
                     break;
                 case "Map":
-                    android.support.v4.app.Fragment fragment = new StudyFinderActivity();
+                    Fragment mapFrag = new StudyFinderActivity();
                     FragmentTransaction mapFt = getSupportFragmentManager().beginTransaction();
-                    mapFt.replace(R.id.frame_content, fragment);
+                    mapFt.replace(R.id.frame_content, mapFrag);
                     mapFt.commit();
+                    break;
+                case "UserInfo":
+                    Fragment userFrag = new UserInfoActivity();
+                    FragmentTransaction userFt = getSupportFragmentManager().beginTransaction();
+                    userFt.replace(R.id.frame_content, userFrag);
+                    userFt.commit();
+                    break;
+                case "StudyGroup":
+                    Fragment studyFrag = new StudyGroupActivity();
+                    FragmentTransaction studyFt = getSupportFragmentManager().beginTransaction();
+                    studyFt.replace(R.id.frame_content, studyFrag);
+                    studyFt.commit();
                     break;
             }
         }catch(Exception ex){
@@ -74,8 +94,10 @@ public class MainDrawer extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.map_with_drawer, menu);
-        return true;
+        //getMenuInflater().inflate(R.menu.map_with_drawer, menu);
+
+        // return false because we do not want an action bar for now
+        return false;
     }
 
     @Override
@@ -99,19 +121,25 @@ public class MainDrawer extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        /*if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        Intent i = new Intent(MainDrawer.this, MainDrawer.class);
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }*/
+        switch(id){
+            case R.id.HomePageBtn:
+                i.putExtra("pageType", "Homescreen");
+                MainDrawer.this.startActivity(i);
+                break;
+            case R.id.UserInfoPageBtn:
+                i.putExtra("pageType", "UserInfo");
+                MainDrawer.this.startActivity(i);
+                break;
+            case R.id.StudyGroupsPageBtn:
+                i.putExtra("pageType", "StudyGroup");
+                MainDrawer.this.startActivity(i);
+                break;
+            case R.id.LogoutBtn:
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                break;
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

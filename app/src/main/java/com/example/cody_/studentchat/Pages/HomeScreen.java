@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,10 +90,6 @@ public class HomeScreen extends Fragment {
                 break;
         }
     }
-    /*@Override
-    public void onBackPressed() {
-
-    }*/
 }
 
 //add sharedpreference

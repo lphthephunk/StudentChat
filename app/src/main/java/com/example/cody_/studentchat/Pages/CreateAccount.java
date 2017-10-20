@@ -231,8 +231,8 @@ public class CreateAccount extends AppCompatActivity {
                             boolean success = jsonResponse.getBoolean("success");
                             if (success) {
 
-                                // store the user object in the sqlite database
-                                user.save();
+                                // store the user object in the sqlite database REMOVE
+                                // user.save();
 
                                 Globals.UUID = user.getUUID();
                                 Globals.currentUserInfo = user;
