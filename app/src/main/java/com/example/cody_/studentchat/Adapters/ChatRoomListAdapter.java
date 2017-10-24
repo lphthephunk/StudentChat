@@ -33,8 +33,7 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomHolder> {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(this.itemResource, parent, false);
 
-        return new ChatRoomHolder(this.context, view);
-
+        return new ChatRoomHolder(this.context, view, this, chatRooms);
     }
 
     @Override
