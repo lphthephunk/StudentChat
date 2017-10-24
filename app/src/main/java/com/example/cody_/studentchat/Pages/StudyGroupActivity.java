@@ -69,7 +69,7 @@ public class StudyGroupActivity extends Fragment {
     public void setStudyGroupList(){
         // TODO: get all joined groups from current user
         try {
-            studyGroupList = Globals.currentUserInfo.getAllJoinedGroups();
+            studyGroupList.addAll(Globals.currentUserInfo.getAllJoinedGroups());
             studyAdapter.notifyDataSetChanged();
         }catch(Exception ex){
             ex.printStackTrace();
