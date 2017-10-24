@@ -63,13 +63,29 @@ public class ChatRooms extends AppCompatActivity {
             }
         });
 
-        populateChatRoomRecycler();
+        //populateChatRoomRecycler();
     }
 
     public void populateChatRoomRecycler(){
         try {
             List<ChatRoom> rooms = ChatRoom.listAll(ChatRoom.class);
             if (rooms != null && !rooms.isEmpty()){
+                chatRoomList.addAll(rooms);
+                chatRoomListAdapter.notifyDataSetChanged();
+
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        try {
+            List<ChatRoom> rooms = ChatRoom.listAll(ChatRoom.class);
+            if (rooms != null && !rooms.isEmpty()){
+                chatRoomList.clear();
                 chatRoomList.addAll(rooms);
                 chatRoomListAdapter.notifyDataSetChanged();
 
