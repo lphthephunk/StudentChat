@@ -1,13 +1,20 @@
 package com.example.cody_.studentchat.Models;
 
+import android.os.AsyncTask;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
+import com.google.gson.reflect.TypeToken;
 import com.orm.SugarApp;
 import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
+import java.lang.reflect.Type;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -17,21 +24,24 @@ import java.util.List;
 public class StudyGroup extends SugarRecord {
 
     @Expose
-    public String groupName;
+    private String groupName;
     @Expose
-    public String subject;
+    private String subject;
     @Expose
-    public String startDate;
+    private String startDate;
     @Expose
-    public String startTime;
+    private String startTime;
     @Expose
-    public List<User> groupMembers;
+    private String latitude;
     @Expose
-    public String latitude;
+    private String longitude;
     @Expose
-    public String longitude;
+    private String groupAdmin;
     @Expose
-    public String groupAdmin;
+    private String jsonGroupMemberList;
+
+    @Ignore
+    private ArrayList<User> groupMembers = new ArrayList<>();
 
     public StudyGroup(){}
 
@@ -44,10 +54,59 @@ public class StudyGroup extends SugarRecord {
         this.subject = subject;
         this.startDate = startDate;
         this.startTime = startTime;
-        this.groupMembers = new ArrayList<>();
     }
 
-    public void addGroupMember(User groupmember){this.groupMembers.add(groupmember);}
+    public void addGroupMember(User groupmember){
+        if (this.groupMembers == null){
+            getGroupMembers();
+        }
+        this.groupMembers.add(groupmember);
+    }
+
+    public void removeGroupMember(User groupMember){
+        if (this.groupMembers == null){
+            getGroupMembers();
+        }
+        for (Iterator<User> iter = groupMembers.listIterator(); iter.hasNext();){
+            User member = iter.next();
+            if (member.getUsername().equals(groupMember.getUsername())){
+                iter.remove();
+                return;
+            }
+        }
+    }
+
+    public void setLatitude(String lat){
+        this.latitude = lat;
+    }
+
+    public void setLongitude(String lng){
+        this.longitude = lng;
+    }
 
     public String getGroupName(){return this.groupName;}
+
+    public String getSubject(){return this.subject;}
+
+    public String getStartDate(){return this.startDate;}
+
+    public String getStartTime(){return this.startTime;}
+
+    public String getLatitude(){return this.latitude;}
+
+    public String getLongitude(){return this.longitude;}
+
+    public List<User> getGroupMembers(){
+        groupMembers = new Gson().fromJson(this.jsonGroupMemberList, new TypeToken<List<User>>(){}.getType());
+        if (groupMembers == null){
+            groupMembers = new ArrayList<>();
+        }
+        return groupMembers;
+    }
+
+    @Override
+    public long save(){
+        jsonGroupMemberList = new Gson().toJson(groupMembers);
+        return super.save();
+    }
 }
