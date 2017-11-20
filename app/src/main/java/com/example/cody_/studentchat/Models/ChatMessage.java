@@ -12,8 +12,6 @@ import java.util.Date;
 
 public class ChatMessage {
 
-    // desearlized json will be bound to these two strings
-
     @SerializedName("username")
     String username;
     @SerializedName("message")

@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,12 +20,14 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomHolder> {
     private final List<ChatRoom> chatRooms;
     private Context context;
     private int itemResource;
+    private Activity activity;
 
-    public ChatRoomListAdapter(Context context, int itemResource, List<ChatRoom> chatRooms){
+    public ChatRoomListAdapter(Context context, Activity activity, int itemResource, List<ChatRoom> chatRooms){
 
         // init the adapter
         this.chatRooms = chatRooms;
         this.context = context;
+        this.activity = activity;
         this.itemResource = itemResource;
     }
 
@@ -33,7 +36,7 @@ public class ChatRoomListAdapter extends RecyclerView.Adapter<ChatRoomHolder> {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(this.itemResource, parent, false);
 
-        return new ChatRoomHolder(this.context, view, this, chatRooms);
+        return new ChatRoomHolder(this.context, this.activity, view, this, chatRooms);
     }
 
     @Override

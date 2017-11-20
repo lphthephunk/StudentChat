@@ -1,20 +1,26 @@
 package com.example.cody_.studentchat.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.cody_.studentchat.Helpers.Globals;
-import com.example.cody_.studentchat.Models.ChatMessage;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Models.ChatRoom;
-import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Pages.ChatRoomActivity;
 import com.example.cody_.studentchat.R;
+import com.example.cody_.studentchat.Services.ChatroomRequests.DeleteChatroomService;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -30,15 +36,17 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
     private ImageView chatRoomImage;
     private TextView chatRoomName;
     private Button deleteChatroomBtn;
+    private Activity activity;
 
     ChatRoomListAdapter adapter;
 
     List<ChatRoom> chatRoomList;
 
-    public ChatRoomHolder(Context context, final View itemView, final ChatRoomListAdapter adapter, final List<ChatRoom> chatRoomList){
+    public ChatRoomHolder(final Context context, final Activity activity, final View itemView, final ChatRoomListAdapter adapter, final List<ChatRoom> chatRoomList){
         super(itemView);
 
         this.context = context;
+        this.activity = activity;
         this.adapter = adapter;
         this.chatRoomList = chatRoomList;
 
@@ -50,8 +58,57 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
         deleteChatroomBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatRoom.delete(chatRoom);
-                UpdateChatList();
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setTitle("Leave Chat?")
+                        .setMessage("Are you sure you want to remove yourself" +
+                                "from the ChatRoom?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // remove from online db
+                                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        try{
+                                            JSONObject jsonResponse = new JSONObject(response);
+                                            boolean success = jsonResponse.getBoolean("success");
+
+                                            if (success){
+                                                // remove from local db
+                                                ChatRoom.delete(chatRoom);
+                                                UpdateChatList();
+                                            }else{
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                                                builder.setTitle("Oops!")
+                                                        .setMessage("We were unable to process this request." +
+                                                                " Ensure that you have a proper internet connection and try again.")
+                                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                // do nothing
+                                                            }
+                                                        });
+                                                AlertDialog dialog = builder.create();
+                                                dialog.show();
+                                            }
+                                        }catch(JSONException e){
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                };
+                                DeleteChatroomService deleteChatroomService = new DeleteChatroomService(chatRoom.getBoundId(),chatRoom.getRoomName(), responseListener);
+                                RequestQueue queue = Volley.newRequestQueue(context);
+                                queue.add(deleteChatroomService);
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -61,12 +118,9 @@ public class ChatRoomHolder extends RecyclerView.ViewHolder implements View.OnCl
     private void UpdateChatList(){
         try {
             List<ChatRoom> rooms = ChatRoom.listAll(ChatRoom.class);
-            if (rooms != null && !rooms.isEmpty()){
-                chatRoomList.clear();
-                chatRoomList.addAll(rooms);
-                adapter.notifyDataSetChanged();
-
-            }
+            chatRoomList.clear();
+            chatRoomList.addAll(rooms);
+            adapter.notifyDataSetChanged();
         }catch(Exception ex){
             ex.printStackTrace();
         }

@@ -1,14 +1,18 @@
 package com.example.cody_.studentchat.Pages;
 
 import android.content.Context;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,8 @@ import android.widget.GridLayout;
 
 import com.example.cody_.studentchat.Adapters.ChatRoomListAdapter;
 import com.example.cody_.studentchat.Adapters.StudyGroupListAdapter;
+import com.example.cody_.studentchat.Fragments.CreatedGroupsFragment;
+import com.example.cody_.studentchat.Fragments.JoinedGroupsFragment;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Models.User;
@@ -29,11 +35,10 @@ import java.util.List;
 
 public class StudyGroupActivity extends Fragment {
 
-    View view;
-    RecyclerView supportGroupRecycler;
-    Context context;
-    List<StudyGroup> studyGroupList;
-    StudyGroupListAdapter studyAdapter;
+    private View view;
+    private Context context;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle savedInstanceState) {
@@ -48,31 +53,49 @@ public class StudyGroupActivity extends Fragment {
 
         context = view.getContext();
 
-        supportGroupRecycler = (RecyclerView)view.findViewById(R.id.studyGroupRecycler);
+        viewPager = (ViewPager)view.findViewById(R.id.groupViewPager);
+        setupViewPager(viewPager);
 
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(context);
-        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        tabLayout = (TabLayout)view.findViewById(R.id.groupTabs);
+        tabLayout.setupWithViewPager(viewPager);
 
-        supportGroupRecycler.setLayoutManager(layoutmanager);
-
-        supportGroupRecycler.setHasFixedSize(false);
-        supportGroupRecycler.setItemAnimator(new DefaultItemAnimator());
-
-        studyGroupList = new ArrayList<>();
-
-        studyAdapter = new StudyGroupListAdapter(context, R.layout.study_group_adapter, studyGroupList);
-        supportGroupRecycler.setAdapter(studyAdapter);
-
-        setStudyGroupList();
+        // TODO: make call to db to get all study groups
     }
 
-    public void setStudyGroupList(){
-        // TODO: get all joined groups from current user
-        try {
-            studyGroupList.addAll(Globals.currentUserInfo.getAllJoinedGroups());
-            studyAdapter.notifyDataSetChanged();
-        }catch(Exception ex){
-            ex.printStackTrace();
+    private void setupViewPager(ViewPager viewPager){
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        adapter.addFragment(new CreatedGroupsFragment(), "Created Groups");
+        adapter.addFragment(new JoinedGroupsFragment(), "Joined Groups");
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter{
+
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title){
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position){
+            return mFragmentTitleList.get(position);
         }
     }
 }

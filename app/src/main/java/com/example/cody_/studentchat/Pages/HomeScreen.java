@@ -19,12 +19,14 @@ import android.widget.TextView;
 
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.MainDrawer;
+import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.R;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.gson.annotations.Expose;
 
 import org.w3c.dom.Text;
 
+import java.util.List;
 import java.util.zip.Inflater;
 
 public class HomeScreen extends Fragment {

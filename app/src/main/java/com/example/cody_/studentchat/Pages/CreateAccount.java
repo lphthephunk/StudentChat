@@ -17,7 +17,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.R;
-import com.example.cody_.studentchat.RegisterRequest;
+import com.example.cody_.studentchat.Services.UserRequests.RegisterRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;

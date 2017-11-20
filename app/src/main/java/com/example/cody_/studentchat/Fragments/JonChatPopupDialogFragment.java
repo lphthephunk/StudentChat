@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.example.cody_.studentchat.Pages.ChatRoomActivity;
 import com.example.cody_.studentchat.Helpers.Globals;
+import com.example.cody_.studentchat.Pages.ChatRoomActivity;
 import com.example.cody_.studentchat.R;
 
 public class JonChatPopupDialogFragment extends DialogFragment {

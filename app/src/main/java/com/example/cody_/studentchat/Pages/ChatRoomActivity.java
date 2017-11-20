@@ -1,13 +1,19 @@
 package com.example.cody_.studentchat.Pages;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,9 +21,9 @@ import android.widget.Toast;
 
 import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
 import com.example.cody_.studentchat.Adapters.VerticalSpacesChat;
-import com.example.cody_.studentchat.Models.ChatMessage;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
+import com.example.cody_.studentchat.Models.ChatMessage;
 import com.example.cody_.studentchat.R;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -59,12 +65,13 @@ public class ChatRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         roomName = getIntent().getStringExtra("chatRoomName");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
 
         setTitle(roomName);
 
@@ -96,8 +103,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         try{
             pubnub.subscribe()
-            .channels(Arrays.asList(roomName))
-            .execute();
+                    .channels(Arrays.asList(roomName))
+                    .execute();
 
             pubnub.addListener(new SubscribeCallback() {
                 @Override
@@ -266,5 +273,27 @@ public class ChatRoomActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         pubnub.destroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_chatroom_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.addUserBtn) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

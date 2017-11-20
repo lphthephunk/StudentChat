@@ -12,20 +12,27 @@ import com.orm.SugarRecord;
 
 public class ChatRoom extends SugarRecord {
     @Expose
-    private String RoomName;
+    private String roomName;
     @Expose
     private int personCount;
     @Expose
     private Bitmap chatRoomImage;
+    @Expose
+    private long boundId;
 
     public ChatRoom(String roomName){
-        this.RoomName = roomName;
+        this.roomName = roomName;
     }
 
     public ChatRoom(){}
 
+    public long getBoundId(){
+        this.boundId = this.getId();
+        return this.boundId;
+    }
+
     public String getRoomName(){
-        return this.RoomName;
+        return this.roomName;
     }
 
     public int GetPersonCount(){

@@ -12,4 +12,6 @@ public class Globals {
     public static String UUID = "";
 
     public static User currentUserInfo;
+
+    public static String SECRET_KEY = "DKJKJOWA1293890ASDJFKJE390SJ32";
 }

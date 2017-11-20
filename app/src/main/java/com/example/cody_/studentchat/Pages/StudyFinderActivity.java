@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -32,11 +33,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Adapters.CustomInfoWindowAdapter;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.R;
+import com.example.cody_.studentchat.Services.ChatroomRequests.InsertChatroomService;
+import com.example.cody_.studentchat.Services.ChatroomRequests.InsertStudyGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdate;
@@ -52,9 +58,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -182,8 +192,8 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                     if (groupList.size() > 0) {
                         StudyGroup myGroup = groupList.get(0);
 
-                        myGroup.latitude = String.valueOf(marker.getPosition().latitude);
-                        myGroup.longitude = String.valueOf(marker.getPosition().longitude);
+                        myGroup.setLatitude(String.valueOf(marker.getPosition().latitude));
+                        myGroup.setLongitude(String.valueOf(marker.getPosition().longitude));
 
                         myGroup.save();
                     }
@@ -215,46 +225,85 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
         mMap.setOnInfoWindowLongClickListener(new GoogleMap.OnInfoWindowLongClickListener() {
             @Override
             public void onInfoWindowLongClick(Marker marker) {
-                currentlySelectedLocation = marker.getPosition();
-                currentlySelectedMarker = marker;
-                String title = marker.getTitle().toString();
-                // TODO: if current user is admin of group, allow them to edit or create
-                if (title.equals("New Study Group")) {
-                    GroupEntryGrid.setVisibility(View.VISIBLE);
-                }else{
-                    // TODO: else, give the user the option to join the room
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Join Group")
-                            .setMessage("Are you sure you want to join this group?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    try {
-                                        List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class, "Select * From STUDY_GROUP Where latitude = ? AND longitude = ? LIMIT 1",
-                                                String.valueOf(currentlySelectedLocation.latitude), String.valueOf(currentlySelectedLocation.longitude));
-                                        StudyGroup group = groupList.get(0);
+                try {
+                    currentlySelectedLocation = marker.getPosition();
+                    currentlySelectedMarker = marker;
+                    String title = marker.getTitle().toString();
 
-                                        if (group.groupMembers == null){
-                                            group.groupMembers = new ArrayList<User>();
+                    // TODO: if current user is admin of group, allow them to edit or create
+                    if (title.equals("New Study Group")) {
+                        GroupEntryGrid.setVisibility(View.VISIBLE);
+                    } else {
+
+                        List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class,
+                                "Select * From STUDY_GROUP Where latitude = ? AND longitude = ? LIMIT 1",
+                                String.valueOf(currentlySelectedLocation.latitude), String.valueOf(currentlySelectedLocation.longitude));
+                        final StudyGroup group = groupList.get(0);
+
+                       if (!isInThisGroup(group)) {
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Join Group")
+                                    .setMessage("Are you sure you want to join this group?")
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            try {
+                                                group.addGroupMember(Globals.currentUserInfo);
+                                                group.save();
+
+                                                Globals.currentUserInfo.addGroup(group);
+
+                                                // TODO: update the phpmyadmin db
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                            }
                                         }
+                                    })
+                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                        group.addGroupMember(Globals.currentUserInfo);
-                                        group.save();
+                                        }
+                                    })
+                                    .show();
+                        } else {
+                            try {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("Already Joined")
+                                        .setMessage("You have already joined this study group. Would you like to leave it?")
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // remove user from this study group
+                                                List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class,
+                                                        "Select * From STUDY_GROUP Where latitude = ? AND longitude = ? LIMIT 1",
+                                                        String.valueOf(currentlySelectedLocation.latitude), String.valueOf(currentlySelectedLocation.longitude));
+                                                StudyGroup group = groupList.get(0);
+                                                group.removeGroupMember(Globals.currentUserInfo);
+                                                group.save();
 
-                                        Globals.currentUserInfo.addGroup(group);
-                                        // TODO: update the phpmyadmin db
-                                    }catch(Exception ex){
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                                                Globals.currentUserInfo.removeUserFromGroup(group);
 
-                                }
-                            })
-                            .show();
+                                                dialog.dismiss();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // do nothing
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }catch(Exception ex){
+                    ex.printStackTrace();
                 }
             }
         });
@@ -298,15 +347,48 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                             && !subjectEdit.getText().toString().isEmpty()
                             && !groupDateEdit.getText().toString().isEmpty()
                             && !groupTimeEdit.getText().toString().isEmpty()) {
+                        Response.Listener<String> responseListener = new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try{
+                                    JSONObject jsonResponse = new JSONObject(response);
+                                    boolean success = jsonResponse.getBoolean("success");
 
-                        // save the group data in the sqlite db
-                        StudyGroup newGroup = new StudyGroup(Globals.currentUserInfo.getUsername(), groupNameEdit.getText().toString(), currentlySelectedLocation, subjectEdit.getText().toString(),
-                                groupDateEdit.getText().toString(), groupTimeEdit.getText().toString());
+                                    if (success){
+                                        // save the group data in the sqlite db
+                                        StudyGroup newGroup = new StudyGroup(Globals.currentUserInfo.getUsername(), groupNameEdit.getText().toString(), currentlySelectedLocation, subjectEdit.getText().toString(),
+                                                groupDateEdit.getText().toString(), groupTimeEdit.getText().toString());
 
-                        newGroup.save();
+                                        newGroup.save();
 
-                        GroupEntryGrid.setVisibility(View.GONE);
-                        currentlySelectedMarker.hideInfoWindow();
+                                        GroupEntryGrid.setVisibility(View.GONE);
+                                        currentlySelectedMarker.hideInfoWindow();
+                                    }else{
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                        builder.setTitle("Oops!")
+                                                .setMessage("There was an issue connecting to the server. We were unable to " +
+                                                        "create a new Study Group. Check your internet connection and try again.")
+                                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // do nothing
+                                                    }
+                                                });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+
+                                        currentlySelectedMarker.hideInfoWindow();
+                                    }
+                                }catch(JSONException ex){
+                                    ex.printStackTrace();
+                                }
+                            }
+                        };
+                        InsertStudyGroup insertStudyGroup = new InsertStudyGroup(groupNameEdit.getText().toString(), subjectEdit.getText().toString(),
+                                groupDateEdit.getText().toString(), groupTimeEdit.getText().toString(), String.valueOf(currentlySelectedLocation.latitude), String.valueOf(currentlySelectedLocation.longitude),
+                                Globals.currentUserInfo.getUsername(), responseListener);
+                        RequestQueue queue = Volley.newRequestQueue(getContext());
+                        queue.add(insertStudyGroup);
                     }
                 }catch(Exception ex){
                     ex.printStackTrace();
@@ -376,11 +458,24 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
     private void getAllStudyGroupMarkers(){
         final List<StudyGroup> groupList = StudyGroup.listAll(StudyGroup.class);
         for (StudyGroup group : groupList) {
-            double lat = Double.valueOf(group.latitude);
-            double lng = Double.valueOf(group.longitude);
+            double lat = Double.valueOf(group.getLatitude());
+            double lng = Double.valueOf(group.getLongitude());
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
             markerList.add(marker);
         }
+    }
+
+    /* Checks if the user is already in the study group that has been selected
+    * */
+    private boolean isInThisGroup(StudyGroup group){
+        List<User> userList = group.getGroupMembers();
+        for (Iterator<User> iter = userList.listIterator(); iter.hasNext();){
+            User user = iter.next();
+            if (user.getUsername().equals(Globals.currentUserInfo.getUsername())){
+                return true;
+            }
+        }
+        return false; // default return value if not in the group
     }
 
     @Override

@@ -59,12 +59,12 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
                 StudyGroup group = groupList.get(0);
 
                 // have to do this for long-click flag in StudyFinderActivity
-                marker.setTitle(group.groupName);
+                marker.setTitle(group.getGroupName());
 
-                groupName.setText(group.groupName);
-                groupSubject.setText(group.subject);
-                groupStartDate.setText(group.startDate);
-                groupStartTime.setText(group.startTime);
+                groupName.setText(group.getGroupName());
+                groupSubject.setText(group.getSubject());
+                groupStartDate.setText(group.getStartDate());
+                groupStartTime.setText(group.getStartTime());
                 // TODO: SET GROUP IMAGE
             }
         }catch(Exception ex){

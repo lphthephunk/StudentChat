@@ -35,9 +35,6 @@
         <activity
             android:name=".Pages.HomeScreen"
             android:label="@string/home_screen" />
-        <activity
-            android:name=".Pages.ChatRoomActivity"
-            android:windowSoftInputMode="adjustPan" />
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -57,7 +54,7 @@
             android:value="StudyGroupDb.db" />
         <meta-data
             android:name="VERSION"
-            android:value="2" />
+            android:value="3" />
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" />
@@ -71,21 +68,31 @@
             android:name="USER"
             android:value=".Models.User" />
 
-        <!--<activity
+        <!--
+            <activity
             android:name=".Pages.StudyFinderActivity"
-            android:label="@string/title_activity_study_finder" />-->
+            android:label="@string/title_activity_study_finder" />
+        -->
         <activity
             android:name=".MainDrawer"
             android:label="@string/title_activity_map_with_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <!--<service
+        <!--
+            <service
             android:name=".Services.StudentChatService"
-            android:exported="false" />-->
+            android:exported="false" />
+        -->
 
         <activity android:name=".Pages.ChatRooms" />
-       <!-- <activity android:name=".Pages.UserInfoActivity" />
-        <activity android:name=".Pages.StudyGroupActivity"></activity>-->
+        <!--
+        <activity android:name=".Pages.UserInfoActivity" />
+        <activity android:name=".Pages.StudyGroupActivity"></activity>
+        -->
+        <activity
+            android:name=".Pages.ChatRoomActivity"
+            android:label="@string/title_activity_chat_room"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

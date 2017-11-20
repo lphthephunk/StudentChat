@@ -48,7 +48,7 @@ public class ChatRooms extends AppCompatActivity {
         chatroomRecycler.setItemAnimator(new DefaultItemAnimator());
 
         chatRoomList = new ArrayList<>();
-        chatRoomListAdapter = new ChatRoomListAdapter(this, R.layout.chatroom_recycler_adapter, chatRoomList);
+        chatRoomListAdapter = new ChatRoomListAdapter(this, ChatRooms.this, R.layout.chatroom_recycler_adapter, chatRoomList);
 
         chatroomRecycler.setAdapter(chatRoomListAdapter);
 
