@@ -1,4 +1,4 @@
-package com.example.cody_.studentchat.Services.ChatroomRequests;
+package com.example.cody_.studentchat.Services.StudyGroupRequests;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;

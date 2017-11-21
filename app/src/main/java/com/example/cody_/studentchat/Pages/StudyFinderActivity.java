@@ -1,27 +1,16 @@
 package com.example.cody_.studentchat.Pages;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.graphics.Camera;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -41,11 +28,12 @@ import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.R;
-import com.example.cody_.studentchat.Services.ChatroomRequests.InsertChatroomService;
-import com.example.cody_.studentchat.Services.ChatroomRequests.InsertStudyGroup;
+import com.example.cody_.studentchat.Services.StudyGroupRequests.DeleteStudyGroup;
+import com.example.cody_.studentchat.Services.StudyGroupRequests.InsertStudyGroup;
+import com.example.cody_.studentchat.Services.StudyGroupRequests.UpdateStudyGroupService;
+import com.example.cody_.studentchat.Services.UserRequests.UpdateUserService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -53,21 +41,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.pubnub.api.models.consumer.history.PNHistoryResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -98,6 +78,13 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
     LatLng currentlySelectedLocation;
     Marker currentlySelectedMarker;
 
+    Marker quickTapCurrentMarker;
+
+    GridLayout iconOptions;
+    Button deleteGroupBtn;
+
+    StudyGroup currentlySelectedGroup;
+
     boolean IsInfoWindowShownOverride = false;
 
 
@@ -108,6 +95,9 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
         GroupEntryGrid = (GridLayout)view.findViewById(R.id.GroupEntryGrid);
         GroupSubmitBtn = (Button)view.findViewById(R.id.GroupSubmitBtn);
         GroupCancelBtn = (Button)view.findViewById(R.id.GroupCancelBtn);
+
+        iconOptions = (GridLayout)view.findViewById(R.id.iconOptions);
+        deleteGroupBtn = (Button)view.findViewById(R.id.DeleteGroupButton);
 
         // entry points for group info
         groupNameEdit = (EditText)view.findViewById(R.id.GroupNameEntry);
@@ -149,8 +139,8 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                // TODO: show popup allowing user to enter data about study group
-
+                // close the icon options pane when the user clicks any blank map area
+                iconOptions.setVisibility(View.GONE);
             }
         });
 
@@ -167,6 +157,8 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                         .snippet(""));
                 markerList.add(marker);
                 marker.setDraggable(true);
+
+                quickTapCurrentMarker = marker;
             }
         });
 
@@ -207,10 +199,27 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
             @Override
             public boolean onMarkerClick(Marker marker) {
                 try {
+                    List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class,
+                        "Select * From STUDY_GROUP Where latitude = ? AND longitude = ? LIMIT 1",
+                        String.valueOf(marker.getPosition().latitude), String.valueOf(marker.getPosition().longitude));
+                    StudyGroup group;
+                    if (groupList.size() == 0){
+                        group = null;
+                        currentlySelectedGroup = null;
+                    }else{
+                        group = groupList.get(0);
+                        currentlySelectedGroup = group;
+                    }
+
                     if (!IsInfoWindowShownOverride) {
+                        if ((group != null && group.getGroupAdmin().equals(Globals.currentUserInfo.getUsername()))
+                                || marker.getTitle().equals("New Study Group")) {
+                            iconOptions.setVisibility(View.VISIBLE);
+                        }
                         marker.showInfoWindow();
                         IsInfoWindowShownOverride = true;
                     }else{
+                        iconOptions.setVisibility(View.GONE);
                         marker.hideInfoWindow();
                         IsInfoWindowShownOverride = false;
                         return true;
@@ -230,11 +239,9 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                     currentlySelectedMarker = marker;
                     String title = marker.getTitle().toString();
 
-                    // TODO: if current user is admin of group, allow them to edit or create
                     if (title.equals("New Study Group")) {
                         GroupEntryGrid.setVisibility(View.VISIBLE);
                     } else {
-
                         List<StudyGroup> groupList = StudyGroup.findWithQuery(StudyGroup.class,
                                 "Select * From STUDY_GROUP Where latitude = ? AND longitude = ? LIMIT 1",
                                 String.valueOf(currentlySelectedLocation.latitude), String.valueOf(currentlySelectedLocation.longitude));
@@ -254,7 +261,71 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
 
                                                 Globals.currentUserInfo.addGroup(group);
 
-                                                // TODO: update the phpmyadmin db
+                                                Globals.currentUserInfo.setJsonJoinedGroups();
+
+                                                // update the user in php my admin
+                                                Response.Listener<String> UserResponseListener = new Response.Listener<String>() {
+                                                    @Override
+                                                    public void onResponse(String response) {
+                                                        try{
+                                                            JSONObject jsonResponse = new JSONObject(response);
+                                                            boolean success = jsonResponse.getBoolean("success");
+
+                                                            if (success){
+                                                                // update the studygroup table to reflect the newly joined user
+                                                                Response.Listener<String> GroupResponseListener = new Response.Listener<String>() {
+                                                                    @Override
+                                                                    public void onResponse(String response) {
+                                                                        try{
+                                                                            JSONObject jsonResponse = new JSONObject(response);
+                                                                            boolean success = jsonResponse.getBoolean("success");
+
+                                                                            if (success){
+                                                                                Toast.makeText(getContext(), "Successfully joined the group", Toast.LENGTH_SHORT).show();
+                                                                            }else{
+                                                                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                                                builder.setTitle("Oops!")
+                                                                                        .setMessage("We had a problem adding you to " + group.getGroupName()+ " Please check your internet connection " +
+                                                                                                "and try again.")
+                                                                                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                                                            @Override
+                                                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                                                // TODO: remove user from the grab on the sqlite side
+                                                                                            }
+                                                                                        });
+                                                                                AlertDialog dialog = builder.create();
+                                                                                dialog.show();
+                                                                            }
+                                                                        }catch(JSONException ex){
+                                                                            ex.printStackTrace();
+                                                                        }
+                                                                    }
+                                                                };
+                                                                UpdateStudyGroupService updateStudyGroupService = new UpdateStudyGroupService(group, GroupResponseListener);
+                                                                RequestQueue queue = Volley.newRequestQueue(getContext());
+                                                                queue.add(updateStudyGroupService);
+                                                            }else{
+                                                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                                builder.setTitle("Oops!")
+                                                                        .setMessage("We had a problem trying to update your joined study groups on the server. Please check your " +
+                                                                                "internet connection and try again.")
+                                                                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                                            @Override
+                                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                                // do nothing
+                                                                            }
+                                                                        });
+                                                                AlertDialog dialog = builder.create();
+                                                                dialog.show();
+                                                            }
+                                                        }catch(JSONException ex){
+                                                            ex.printStackTrace();
+                                                        }
+                                                    }
+                                                };
+                                                UpdateUserService updateUserService = new UpdateUserService(Globals.currentUserInfo, UserResponseListener);
+                                                RequestQueue queue = Volley.newRequestQueue(getContext());
+                                                queue.add(updateUserService);
                                             } catch (Exception ex) {
                                                 ex.printStackTrace();
                                             }
@@ -363,6 +434,7 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
 
                                         GroupEntryGrid.setVisibility(View.GONE);
                                         currentlySelectedMarker.hideInfoWindow();
+                                        currentlySelectedMarker.setTitle(newGroup.getGroupName());
                                     }else{
                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                         builder.setTitle("Oops!")
@@ -378,6 +450,7 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                                         dialog.show();
 
                                         currentlySelectedMarker.hideInfoWindow();
+                                        iconOptions.setVisibility(View.GONE);
                                     }
                                 }catch(JSONException ex){
                                     ex.printStackTrace();
@@ -400,6 +473,66 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
             @Override
             public void onClick(View v) {
                 GroupEntryGrid.setVisibility(View.GONE);
+            }
+        });
+
+        deleteGroupBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Verify")
+                        .setMessage("Are you sure you want to delete this Study Group?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (currentlySelectedGroup == null){
+                                    // remove the pin from the map
+                                    markerList.remove(quickTapCurrentMarker);
+                                    quickTapCurrentMarker.remove();
+                                    iconOptions.setVisibility(View.GONE);
+                                }else {
+                                    Response.Listener<String> ResponseListener = new Response.Listener<String>() {
+                                        @Override
+                                        public void onResponse(String response) {
+                                            try {
+                                                JSONObject jsonResponse = new JSONObject(response);
+                                                boolean success = jsonResponse.getBoolean("success");
+
+                                                if (success) {
+                                                    Toast.makeText(getContext(), "Deleted " + quickTapCurrentMarker.getTitle(), Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                                    builder.setTitle("Oops!")
+                                                            .setMessage("There was a problem deleting this Study Group. Check your internet connection" +
+                                                                    " and try again.")
+                                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    // do nothing
+                                                                }
+                                                            });
+                                                    AlertDialog dialog = builder.create();
+                                                    dialog.show();
+                                                }
+                                            } catch (JSONException ex) {
+                                                ex.printStackTrace();
+                                            }
+                                        }
+                                    };
+                                    DeleteStudyGroup deleteStudyGroup = new DeleteStudyGroup(currentlySelectedGroup, ResponseListener);
+                                    RequestQueue queue = Volley.newRequestQueue(getContext());
+                                    queue.add(deleteStudyGroup);
+                                }
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 

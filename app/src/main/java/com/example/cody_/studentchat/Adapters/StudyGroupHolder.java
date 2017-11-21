@@ -25,7 +25,6 @@ public class StudyGroupHolder extends RecyclerView.ViewHolder implements View.On
 
         this.context = context;
 
-        // TODO: bind UI objects
         groupName = (TextView)itemView.findViewById(R.id.StudyGroupNameTextView);
 
         itemView.setOnClickListener(this);
@@ -35,7 +34,6 @@ public class StudyGroupHolder extends RecyclerView.ViewHolder implements View.On
 
         this.studyGroup = studyGroup;
 
-        // TODO: bind the data to the UI objects
         groupName.setText(studyGroup.getGroupName());
     }
 

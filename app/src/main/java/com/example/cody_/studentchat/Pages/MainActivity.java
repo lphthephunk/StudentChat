@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                                 String lastname = jsonResponse.getString("lastname");
                                 String email = jsonResponse.getString("email");
                                 String uuid = jsonResponse.getString("uuid");
+                                String joinedGroups = jsonResponse.getString("joinedGroups");
 
                                 User user = new User(username, firstname, lastname, email, uuid);
                                 Globals.currentUserInfo = user;

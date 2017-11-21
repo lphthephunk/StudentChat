@@ -86,6 +86,8 @@ public class StudyGroup extends SugarRecord {
 
     public String getGroupName(){return this.groupName;}
 
+    public String getGroupAdmin(){return this.groupAdmin;}
+
     public String getSubject(){return this.subject;}
 
     public String getStartDate(){return this.startDate;}
@@ -95,6 +97,8 @@ public class StudyGroup extends SugarRecord {
     public String getLatitude(){return this.latitude;}
 
     public String getLongitude(){return this.longitude;}
+
+    public String getJsonGroupMemberList(){return this.jsonGroupMemberList;}
 
     public List<User> getGroupMembers(){
         groupMembers = new Gson().fromJson(this.jsonGroupMemberList, new TypeToken<List<User>>(){}.getType());

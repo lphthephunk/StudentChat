@@ -28,6 +28,8 @@ public class User extends SugarRecord {
     private String uuid;
     @Expose
     private String username;
+    @Expose
+    private String jsonJoinedGroups;
 
     @Ignore
     private transient ArrayList<StudyGroup> joinedGroups = new ArrayList<>();
@@ -56,12 +58,26 @@ public class User extends SugarRecord {
 
     public String getUsername(){return this.username;}
 
+    public String getFirstName(){return this.firstName;}
+
+    public String getLastName(){return this.lastName;}
+
     public void addGroup(StudyGroup group){
         joinedGroups.add(group);
     }
 
-    public List<StudyGroup> getAllJoinedGroups(){
+    public List<StudyGroup> getAllJoinedGroups() {
+        joinedGroups = new Gson().fromJson(this.jsonJoinedGroups, new TypeToken<List<StudyGroup>>(){}.getType());
+        if (joinedGroups == null){
+            joinedGroups = new ArrayList<>();
+        }
         return joinedGroups;
+    }
+
+    public String getJsonJoinedGroups(){return this.jsonJoinedGroups;}
+
+    public void setJsonJoinedGroups(){
+        jsonJoinedGroups = new Gson().toJson(joinedGroups);
     }
 
     public void removeUserFromGroup(StudyGroup group){
