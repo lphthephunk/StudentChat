@@ -2,11 +2,18 @@ package com.example.cody_.studentchat.Models;
 
 import android.provider.BaseColumns;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,7 +35,7 @@ public class User extends SugarRecord {
     private String uuid;
     @Expose
     private String username;
-    @Expose
+    @Ignore
     private String jsonJoinedGroups;
 
     @Ignore
@@ -67,21 +74,41 @@ public class User extends SugarRecord {
     }
 
     public List<StudyGroup> getAllJoinedGroups() {
-        joinedGroups = new Gson().fromJson(this.jsonJoinedGroups, new TypeToken<List<StudyGroup>>(){}.getType());
-        if (joinedGroups == null){
-            joinedGroups = new ArrayList<>();
+        joinedGroups.clear();
+        try{
+            JSONArray jArray = new JSONArray(jsonJoinedGroups);
+            for (int i = 0; i<jArray.length(); i++){
+                JSONObject jObject = jArray.getJSONObject(i);
+                String GroupName = jObject.getString("groupName");
+                String GroupAdmin = jObject.getString("groupAdmin");
+                String startTime = jObject.getString("startTime");
+                String startDate = jObject.getString("startDate");
+                String latitude = jObject.getString("latitude");
+                String longitude = jObject.getString("longitude");
+                String subject = jObject.getString("subject");
+                StudyGroup group = new StudyGroup(GroupAdmin, GroupName, new LatLng(Double.valueOf(latitude), Double.valueOf(longitude)), subject, startDate,
+                        startTime);
+                joinedGroups.add(group);
+            }
+            return joinedGroups;
+        }catch(JSONException ex){
+            ex.printStackTrace();
+            return null;
         }
-        return joinedGroups;
     }
 
     public String getJsonJoinedGroups(){return this.jsonJoinedGroups;}
 
     public void setJsonJoinedGroups(){
-        jsonJoinedGroups = new Gson().toJson(joinedGroups);
+        jsonJoinedGroups = new Gson().toJson(joinedGroups, new TypeToken<List<StudyGroup>>(){}.getType());
+    }
+
+    public void setRawJsonGroupValue(String json){
+        this.jsonJoinedGroups = json;
     }
 
     public void removeUserFromGroup(StudyGroup group){
-        for (Iterator<StudyGroup> iterator = joinedGroups.listIterator(); iterator.hasNext();){
+        /*for (Iterator<StudyGroup> iterator = joinedGroups.listIterator(); iterator.hasNext();){
             StudyGroup compareGroup = iterator.next();
             if (compareGroup.getLatitude().equals(group.getLatitude()) && compareGroup.getLongitude().equals(group.getLongitude())
                     && compareGroup.getGroupName().equals(group.getGroupName()) && compareGroup.getStartTime().equals(group.getStartTime())
@@ -90,6 +117,11 @@ public class User extends SugarRecord {
                 iterator.remove();
                 return;
             }
+        }*/
+        try {
+            joinedGroups.remove(group.getGroupName());
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
     }
 }

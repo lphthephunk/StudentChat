@@ -4,12 +4,24 @@ import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.MalformedJsonException;
 import com.orm.SugarApp;
 import com.orm.SugarRecord;
 import com.orm.dsl.Ignore;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.sql.Time;
 import java.util.ArrayList;
@@ -41,7 +53,7 @@ public class StudyGroup extends SugarRecord {
     private String jsonGroupMemberList;
 
     @Ignore
-    private ArrayList<User> groupMembers = new ArrayList<>();
+    private ArrayList<String> groupMembers = new ArrayList<>();
 
     public StudyGroup(){}
 
@@ -60,17 +72,18 @@ public class StudyGroup extends SugarRecord {
         if (this.groupMembers == null){
             getGroupMembers();
         }
-        this.groupMembers.add(groupmember);
+        this.groupMembers.add(groupmember.getUsername());
     }
 
     public void removeGroupMember(User groupMember){
         if (this.groupMembers == null){
             getGroupMembers();
         }
-        for (Iterator<User> iter = groupMembers.listIterator(); iter.hasNext();){
-            User member = iter.next();
-            if (member.getUsername().equals(groupMember.getUsername())){
-                iter.remove();
+        for (Iterator<String> iter = groupMembers.listIterator(); iter.hasNext();){
+            String member = iter.next();
+            if (member.equals(groupMember.getUsername())){
+                this.groupMembers.remove(member);
+                jsonGroupMemberList = new Gson().toJson(groupMembers, new TypeToken<List<User>>(){}.getType());
                 return;
             }
         }
@@ -100,17 +113,27 @@ public class StudyGroup extends SugarRecord {
 
     public String getJsonGroupMemberList(){return this.jsonGroupMemberList;}
 
-    public List<User> getGroupMembers(){
-        groupMembers = new Gson().fromJson(this.jsonGroupMemberList, new TypeToken<List<User>>(){}.getType());
-        if (groupMembers == null){
-            groupMembers = new ArrayList<>();
+    public List<String> getGroupMembers(){
+        try {
+            JSONArray jArray = new JSONArray(jsonGroupMemberList);
+            for (int i = 0; i < jArray.length(); i++){
+                //JSONObject jObject = jArray.getJSONObject(i);
+                String groupMember = jArray.getString(i);
+                groupMembers.add(groupMember);
+            }
+            return groupMembers;
+        }catch(JSONException ex){
+            ex.printStackTrace();
+            return null;
         }
-        return groupMembers;
     }
 
+   public void setJsonGroupMemberList(String groupMembersJson){
+       this.jsonGroupMemberList = groupMembersJson;
+   }
     @Override
     public long save(){
-        jsonGroupMemberList = new Gson().toJson(groupMembers);
+        jsonGroupMemberList = new Gson().toJson(groupMembers, new TypeToken<List<User>>(){}.getType());
         return super.save();
     }
 }

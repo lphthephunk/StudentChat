@@ -5,6 +5,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Services.ChatroomRequests.DeleteChatroomService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -17,7 +18,9 @@ public class DeleteStudyGroup extends StringRequest {
     private Map<String, String> params;
 
     public DeleteStudyGroup(StudyGroup group, Response.Listener<String> listener){
-        super(Method.DELETE, DELETE_STUDYGROUP, listener, null);
+        super(Method.POST, DELETE_STUDYGROUP, listener, null);
+
+        params = new HashMap<>();
 
         params.put("groupAdmin", group.getGroupAdmin());
         params.put("latitude", group.getLatitude());

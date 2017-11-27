@@ -24,6 +24,7 @@ public class UpdateUserService extends StringRequest {
         params.put("firstName", user.getFirstName());
         params.put("lastName", user.getLastName());
         params.put("email", user.getEmail());
+        user.setJsonJoinedGroups();
         params.put("joinedGroups", user.getJsonJoinedGroups());
     }
 

@@ -35,9 +35,11 @@ public class CreateAccount extends AppCompatActivity {
     EditText etemailConfirm;
     EditText etmobile;
     Button save;
+    Button verify;
 
     boolean password_check = false;
     boolean email_check = false;
+    boolean verification = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -10,10 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
 import com.example.cody_.studentchat.Adapters.StudyGroupListAdapter;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.R;
+import com.example.cody_.studentchat.Services.StudyGroupRequests.GetAdminGroups;
+import com.google.android.gms.maps.model.LatLng;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +63,34 @@ public class CreatedGroupsFragment extends Fragment {
 
     private void populateList(){
         try {
-            List<StudyGroup> studyGroups = StudyGroup.findWithQuery(StudyGroup.class,
-                    "Select * From STUDY_GROUP Where group_admin = ?", Globals.currentUserInfo.getUsername());
+            Response.Listener<String> ResponseListener = new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try{
+                        JSONArray jsonResponse = new JSONArray(response);
 
-            createdStudyGroups.clear();
-            createdStudyGroups.addAll(studyGroups);
-            studyGroupListAdapter.notifyDataSetChanged();
+                            int length = jsonResponse.length();
+                            for (int i = 0; i < length; i++) {
+                                JSONObject jsonObject = jsonResponse.getJSONObject(i);
+                                String adminName = jsonObject.getString("groupAdmin");
+                                String groupName = jsonObject.getString("groupName");
+                                String subject = jsonObject.getString("subject");
+                                String latitude = jsonObject.getString("latitude");
+                                String longitude = jsonObject.getString("longitude");
+                                String startTime = jsonObject.getString("startTime");
+                                String startDate = jsonObject.getString("startDate");
+                                StudyGroup group = new StudyGroup(adminName, groupName, new LatLng(Double.valueOf(latitude), Double.valueOf(longitude)),subject, startDate, startTime);
+                                createdStudyGroups.add(group);
+                            }
+                            studyGroupListAdapter.notifyDataSetChanged();
+                    }catch(JSONException ex){
+                        ex.printStackTrace();
+                    }
+                }
+            };
+            GetAdminGroups getAdminGroups = new GetAdminGroups(ResponseListener);
+            RequestQueue queue = Volley.newRequestQueue(getContext());
+            queue.add(getAdminGroups);
         }catch (Exception ex){
             ex.printStackTrace();
         }
