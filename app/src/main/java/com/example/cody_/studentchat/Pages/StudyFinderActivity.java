@@ -258,6 +258,8 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
 
                                         group.setJsonGroupMemberList(groupMembers);
 
+                                        group.save();
+
                                         currentlySelectedGroup = group;
 
                                         if (!IsInfoWindowShownOverride) {
@@ -445,7 +447,7 @@ public class StudyFinderActivity extends Fragment implements OnMapReadyCallback,
                                                                         boolean success = jsonResponse.getBoolean("success");
 
                                                                         if (success){
-                                                                            Globals.currentUserInfo.setJsonJoinedGroups();
+                                                                            //Globals.currentUserInfo.setJsonJoinedGroups();
                                                                             Toast.makeText(getContext(), "Removed", Toast.LENGTH_SHORT).show();
                                                                         }else{
                                                                             // do nothing

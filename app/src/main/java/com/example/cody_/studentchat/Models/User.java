@@ -73,7 +73,7 @@ public class User extends SugarRecord {
         joinedGroups.add(group);
     }
 
-    public List<StudyGroup> getAllJoinedGroups() {
+    /*public List<StudyGroup> getAllJoinedGroups() {
         joinedGroups.clear();
         try{
             JSONArray jArray = new JSONArray(jsonJoinedGroups);
@@ -95,7 +95,7 @@ public class User extends SugarRecord {
             ex.printStackTrace();
             return null;
         }
-    }
+    }*/
 
     public String getJsonJoinedGroups(){return this.jsonJoinedGroups;}
 
@@ -108,7 +108,7 @@ public class User extends SugarRecord {
     }
 
     public void removeUserFromGroup(StudyGroup group){
-        /*for (Iterator<StudyGroup> iterator = joinedGroups.listIterator(); iterator.hasNext();){
+        for (Iterator<StudyGroup> iterator = joinedGroups.listIterator(); iterator.hasNext();){
             StudyGroup compareGroup = iterator.next();
             if (compareGroup.getLatitude().equals(group.getLatitude()) && compareGroup.getLongitude().equals(group.getLongitude())
                     && compareGroup.getGroupName().equals(group.getGroupName()) && compareGroup.getStartTime().equals(group.getStartTime())
@@ -117,11 +117,6 @@ public class User extends SugarRecord {
                 iterator.remove();
                 return;
             }
-        }*/
-        try {
-            joinedGroups.remove(group.getGroupName());
-        }catch(Exception ex){
-            ex.printStackTrace();
         }
     }
 }

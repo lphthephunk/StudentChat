@@ -114,22 +114,34 @@ public class StudyGroup extends SugarRecord {
     public String getJsonGroupMemberList(){return this.jsonGroupMemberList;}
 
     public List<String> getGroupMembers(){
-        try {
-            JSONArray jArray = new JSONArray(jsonGroupMemberList);
-            for (int i = 0; i < jArray.length(); i++){
-                //JSONObject jObject = jArray.getJSONObject(i);
-                String groupMember = jArray.getString(i);
-                groupMembers.add(groupMember);
-            }
-            return groupMembers;
-        }catch(JSONException ex){
-            ex.printStackTrace();
-            return null;
-        }
+        return this.groupMembers;
     }
 
    public void setJsonGroupMemberList(String groupMembersJson){
        this.jsonGroupMemberList = groupMembersJson;
+       try {
+           JSONArray jsonArray = new JSONArray(jsonGroupMemberList);
+           int length = jsonArray.length();
+           groupMembers.clear();
+           for (int i = 0; i < length; i++){
+               JSONObject jsonObject = jsonArray.getJSONObject(i);
+               String username = jsonObject.getString("username");
+               groupMembers.add(username);
+           }
+       }catch(JSONException ex){
+           ex.printStackTrace();
+           try {
+               // if we trip this far, then the json is of only username form instead of the entire object
+               JSONArray jsonArray = new JSONArray(jsonGroupMemberList);
+               int length = jsonArray.length();
+               for (int i = 0; i < length; i++) {
+                   String username = jsonArray.getString(i);
+                   groupMembers.add(username);
+               }
+           }catch(JSONException error) {
+               error.printStackTrace();
+           }
+       }
    }
     @Override
     public long save(){
