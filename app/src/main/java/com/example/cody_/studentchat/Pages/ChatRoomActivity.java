@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -20,7 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cody_.studentchat.Adapters.ChatMessageAdapter;
+import com.example.cody_.studentchat.Adapters.StudyGroupFragAdapter;
 import com.example.cody_.studentchat.Adapters.VerticalSpacesChat;
+import com.example.cody_.studentchat.Fragments.CreateChatPopupDialogFragment;
+import com.example.cody_.studentchat.Fragments.StudyGroupFragment;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Keys.API_Keys;
 import com.example.cody_.studentchat.Models.ChatMessage;
@@ -61,6 +65,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     PubNub pubnub;
     JSONObject messageObject;
 
+    EditText messageEntryText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +81,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         setTitle(roomName);
 
-        final EditText messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
+        messageEntryText = (EditText) findViewById(R.id.messageContentEdit);
 
         messageRecyclerView = (RecyclerView) findViewById(R.id.messageRecycler);
 
@@ -181,7 +187,6 @@ public class ChatRoomActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 // check if the send button has been pressed by the user
                 if (actionId == EditorInfo.IME_ACTION_SEND){
-                    // TODO: send message to group
                     String message = messageEntryText.getText().toString().trim();
                     if (message.length() != 0){
                         message = gson.toJson(new ChatMessage(Globals.currentUserInfo.concatFirstAndLastName(), message));
@@ -292,6 +297,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.addUserBtn) {
             return true;
+        }else if (id == R.id.addStudyGroupBtn){
+            try {
+                FragmentManager fm = getSupportFragmentManager();
+                StudyGroupFragment dialogFragment = new StudyGroupFragment();
+                dialogFragment.show(fm, "Share a StudyGroup");
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
         }
 
         return super.onOptionsItemSelected(item);

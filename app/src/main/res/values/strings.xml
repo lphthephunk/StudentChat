@@ -44,6 +44,7 @@
 
     <!-- chatroom menu-->
     <string name="addUserMenu">Add User</string>
+    <string name="addGroupBtn">Add StudyGroup</string>
 
     <!-- icon options-->
     <string name="deleteGroupBtn">Delete Group</string>

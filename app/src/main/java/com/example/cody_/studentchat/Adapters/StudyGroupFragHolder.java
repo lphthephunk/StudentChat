@@ -1,43 +1,45 @@
 package com.example.cody_.studentchat.Adapters;
 
 import android.content.Context;
-import android.content.ReceiverCallNotAllowedException;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.R;
 
 /**
- * Created by Cody_ on 10/19/2017.
+ * Created by Cody_ on 11/27/2017.
  */
 
-public class StudyGroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class StudyGroupFragHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    Context context;
+    private Context context;
     StudyGroup studyGroup;
-
     TextView groupName;
 
-    public StudyGroupHolder(Context context, View itemView){
+    public StudyGroupFragHolder(Context context, View itemView){
         super(itemView);
 
         this.context = context;
-
+       // this.messageEntryBar = (EditText)itemView.findViewById(R.id.messageContentEdit);
         groupName = (TextView)itemView.findViewById(R.id.StudyGroupNameTextView);
+
 
         itemView.setOnClickListener(this);
     }
 
-    public void BindStudyGroup(StudyGroup studyGroup){
-
+    public void BindStudyGroup(StudyGroup studyGroup) {
         this.studyGroup = studyGroup;
-
         groupName.setText(studyGroup.getGroupName());
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v){
+        Globals.GroupToShare = this.studyGroup;
+        v.setBackgroundColor(Color.BLUE);
     }
 }

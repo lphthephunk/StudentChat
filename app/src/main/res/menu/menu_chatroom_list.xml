@@ -8,4 +8,8 @@
         android:orderInCategory="100"
         android:title="@string/addUserMenu"
         app:showAsAction="never" />
+    <item android:id="@+id/addStudyGroupBtn"
+        android:orderInCategory="100"
+        android:title="@string/addGroupBtn"
+        app:showAsAction="never"/>
 </menu>

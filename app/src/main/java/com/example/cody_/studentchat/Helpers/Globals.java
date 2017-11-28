@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat.Helpers;
 
+import com.example.cody_.studentchat.Models.StudyGroup;
 import com.example.cody_.studentchat.Models.User;
 
 /**
@@ -14,4 +15,6 @@ public class Globals {
     public static User currentUserInfo;
 
     public static String SECRET_KEY = "DKJKJOWA1293890ASDJFKJE390SJ32";
+
+    public static StudyGroup  GroupToShare;
 }
