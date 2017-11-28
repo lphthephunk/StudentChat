@@ -1,5 +1,6 @@
 package com.example.cody_.studentchat.Pages;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
@@ -7,13 +8,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.example.cody_.studentchat.Adapters.GMailSender;
 import com.example.cody_.studentchat.Helpers.Globals;
 import com.example.cody_.studentchat.Models.User;
 import com.example.cody_.studentchat.R;
@@ -21,6 +26,8 @@ import com.example.cody_.studentchat.Services.UserRequests.RegisterRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Random;
 
 import static java.util.UUID.randomUUID;
 
@@ -55,10 +62,15 @@ public class CreateAccount extends AppCompatActivity {
         etemailConfirm = (EditText)findViewById(R.id.editTextConfirmEmail);
         etmobile = (EditText)findViewById(R.id.editTextPhoneNumber);
         save = (Button)findViewById(R.id.buttonCreateAccount);
+        verify = (Button)findViewById(R.id.buttonVerify);
 
         save.setEnabled(false);
+        verify.setEnabled(false);
 
         final Drawable originalDra = etusername.getBackground();
+        Random r = new Random( System.currentTimeMillis() );
+        int x = ((1 + r.nextInt(2)) * 10000 + r.nextInt(10000));
+        final String code = Integer.toString(x);
 
         etusername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -88,7 +100,7 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etpasswordConfirm.setBackgroundResource(R.drawable.green_box);
                     password_check = true;
-                    if (email_check)
+                    if (verification && email_check)
                     {
                         save.setEnabled(true);
                     }
@@ -124,7 +136,7 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etpasswordConfirm.setBackgroundResource(R.drawable.green_box);
                     password_check = true;
-                    if (email_check)
+                    if (verification && email_check)
                     {
                         save.setEnabled(true);
                     }
@@ -156,13 +168,15 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etemailConfirm.setBackgroundResource(R.drawable.green_box);
                     email_check = true;
-                    if (password_check)
+                    verify.setEnabled(true);
+                    if (verification && password_check)
                     {
                         save.setEnabled(true);
                     }
                 }
                 else
                 {
+                    verify.setEnabled(false);
                     etemailConfirm.setBackgroundResource(R.drawable.red_box);
                     email_check = false;
                     save.setEnabled(false);
@@ -191,13 +205,15 @@ public class CreateAccount extends AppCompatActivity {
                 {
                     etemailConfirm.setBackgroundResource(R.drawable.green_box);
                     email_check = true;
-                    if (password_check)
+                    verify.setEnabled(true);
+                    if (verification && password_check)
                     {
                         save.setEnabled(true);
                     }
                 }
                 else
                 {
+                    verify.setEnabled(false);
                     etemailConfirm.setBackgroundResource(R.drawable.red_box);
                     email_check = false;
                     save.setEnabled(false);
@@ -210,20 +226,79 @@ public class CreateAccount extends AppCompatActivity {
             }
         });
 
+        verify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Thread sender = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            GMailSender sender = new GMailSender("studyroomapplication@gmail.com", "inho123123");
+                            sender.sendMail("Verification Code", code, "incho0824@gmail.com", etemail.getText().toString());
+                        } catch (Exception e) {
+                            Log.e("mylog", "Error: " + e.getMessage());
+                        }
+                    }
+                });
+                sender.start();
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(CreateAccount.this);
+                alertDialog.setTitle("E-Mail Verification Sent to " + etemail.getText().toString());
+                alertDialog.setMessage("If verification code is not received: go back and re-verify your email");
+
+                final EditText input = new EditText(CreateAccount.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                alertDialog.setView(input);
+
+                alertDialog.setPositiveButton("Re-verify",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                alertDialog.setNegativeButton("Confirm",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                String num = input.getText().toString();
+                                if (num.equals(code)) {
+                                    Toast.makeText(getApplicationContext(),"Verification Succeeded", Toast.LENGTH_LONG).show();
+                                    verification = true;
+                                    if (password_check && email_check) {
+                                        save.setEnabled(true);
+                                    }
+
+                                } else {
+                                    Toast.makeText(getApplicationContext(),"Wrong Verification Code!", Toast.LENGTH_LONG).show();
+                                    verification = false;
+                                }
+                            }
+                        });
+
+                alertDialog.show();
+            }
+
+        });
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = etusername.getText().toString();
-                String firstname = etfirstname.getText().toString();
-                String lastname = etlastname.getText().toString();
-                String password = etpassword.getText().toString();
-                String email = etemail.getText().toString();
-                String uuid = randomUUID().toString();
-
+                final String username = etusername.getText().toString();
+                final String firstname = etfirstname.getText().toString();
+                final String lastname = etlastname.getText().toString();
+                final String password = etpassword.getText().toString();
+                final String email = etemail.getText().toString();
+                final String uuid = randomUUID().toString();
+                long mobile = 0000000000;
+                if (!etmobile.getText().toString().matches("")) {
+                    mobile = Long.parseLong(etmobile.getText().toString());
+                }
                 // create new user object
                 final User user = new User(username, firstname, lastname, email, uuid);
-
-                long mobile = Long.parseLong(etmobile.getText().toString());
 
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override

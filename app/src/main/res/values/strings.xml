@@ -20,6 +20,8 @@
     <string name="old_account"><u>Forgot Username/Password</u></string>
     <string name="action_settings"></string>
     <string name="phone_number_hint">Example: 1231231234</string>
+    <string name="retrieve">Retrieve</string>
+    <string name="verify">Verify</string>
 
     <string name="messageHint">Type here...</string>
 
