@@ -1,10 +1,12 @@
 package com.example.cody_.studentchat.Fragments;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,8 +70,19 @@ public class StudyGroupFragment extends DialogFragment {
             public void onClick(View v) {
                 ChatRoomActivity parent = (ChatRoomActivity)getActivity();
                 EditText messageBar = (EditText)parent.findViewById(R.id.messageContentEdit);
-                String coordinates = String.valueOf(Globals.GroupToShare.getLatitude()) + ", " + String.valueOf(Globals.GroupToShare.getLongitude());
-                messageBar.setText(coordinates);
+                StringBuilder builder = new StringBuilder();
+                builder.append("Group Name: " + Globals.GroupToShare.getGroupName());
+                builder.append("\n");
+                builder.append("Subject: " + Globals.GroupToShare.getSubject());
+                builder.append("\n");
+                builder.append("Start Date: " + Globals.GroupToShare.getStartDate());
+                builder.append("\n");
+                builder.append("Start Time: " + Globals.GroupToShare.getStartTime());
+                builder.append("\n");
+                String query = URLEncoder.encode(String.valueOf(Globals.GroupToShare.getLatitude()) + ", " + String.valueOf(Globals.GroupToShare.getLongitude()));
+                builder.append("Click to navigate: " + "https://www.google.com/maps/search/?api=1&query=" + query);
+
+                messageBar.setText(builder.toString());
                 dismiss();
             }
         });

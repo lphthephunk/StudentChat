@@ -21,6 +21,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:textColor="@android:color/black"
+                android:autoLink="web"
                 android:paddingTop="3dp"
                 android:paddingLeft="5dp"/>
 

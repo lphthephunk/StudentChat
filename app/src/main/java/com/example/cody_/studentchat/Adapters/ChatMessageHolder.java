@@ -2,6 +2,8 @@ package com.example.cody_.studentchat.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -30,6 +32,7 @@ public class ChatMessageHolder extends RecyclerView.ViewHolder implements View.O
         // bind the UI widgets
         this.username = (TextView)itemView.findViewById(R.id.usernameBlock);
         this.messageBlock = (TextView)itemView.findViewById(R.id.messageBlock);
+        this.messageBlock.setMovementMethod(LinkMovementMethod.getInstance());
 
         // set click event listener
         itemView.setOnClickListener(this);
